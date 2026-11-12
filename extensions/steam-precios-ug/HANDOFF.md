@@ -24,7 +24,7 @@ La extensión elimina el paso 1 y la incertidumbre de los demás. Al lado de cad
 ## Decisiones tomadas
 
 - **Extensión de navegador**, Manifest V3, para Chromium (Brave, Chrome, Edge, Opera). Firefox queda para después y solo si alguien lo usa.
-- **No usar Millennium** ni ningún mod del cliente de Steam. Se descartó por ser no oficial y frágil ante actualizaciones. Ya se desinstaló y no quedan restos.
+- **No modificar Steam.** Nada de Millennium ni de ningún mod del cliente. El usuario no quiere tocar Steam, y además esos mods son no oficiales y frágiles ante actualizaciones. Millennium ya se desinstaló y no quedan restos.
 - **Funciona sin iniciar sesión y con cualquier VPN.** La extensión no se fía de la moneda que muestra la página: lee qué app o paquete es y pide su precio en Ucrania a la API de Steam (`cc=ua`).
 - **Mostrar el precio en HK$, no sugerir tarjetas.** El usuario lo pidió así: con el monto en HK$ cada uno deduce qué tarjeta o cuántas compra. Una sugerencia de tarjetas puede existir como ajuste **apagado por defecto**.
 - **Carrito propio: "Lista UG".** El carrito de Steam exige sesión, así que la extensión tiene su propia lista:
@@ -151,16 +151,9 @@ Formatos:
 | Comparación de regiones en la ficha | encendido |
 | Sugerir tarjetas | **apagado** |
 
-## Código anterior de referencia
+## Sin código previo
 
-Existe un prototipo para Millennium, ya descartado, en `C:\Users\D\ug-steam-prices`, fuera de este repositorio. Su lógica sirve de punto de partida:
-
-- `shared/calc.ts`: conversiones, formatos y planificador de tarjetas.
-- `shared/settings.ts`: ajustes y valores por defecto.
-- `shared/regions.ts`: nombres de regiones en español.
-- `webview/store.ts`: detección de precios en la página, carrito y tabla de regiones.
-
-Ese código lee el precio de la página en vez de pedirlo por id a la API, y no tiene la Lista UG. No se ejecutó nunca dentro de Steam. Úsalo como referencia y no como base.
+Hubo un prototipo como plugin de Millennium, descartado y borrado porque el usuario no quiere modificar Steam. Todo lo útil de él está en este documento. La extensión se escribe desde cero.
 
 ## Primeros pasos sugeridos
 
