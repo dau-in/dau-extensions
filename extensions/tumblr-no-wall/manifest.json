@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Tumblr Sin Login Wall",
+  "version": "1.2.0",
+  "description": "Oculta el popup de 'Sign up or log in' de Tumblr y devuelve el scroll.",
+  "content_scripts": [
+    {
+      "matches": ["*://*.tumblr.com/*"],
+      "css": ["content.css"],
+      "js": ["content.js", "viewer.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+}
