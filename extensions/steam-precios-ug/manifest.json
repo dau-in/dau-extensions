@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Ukrainian Gang Extension",
+  "short_name": "UG Extension",
+  "version": "0.1.0",
+  "description": "Precios de Steam Ucrania en HK$, USDT y bolívares (Binance P2P), con una lista de compra para el grupo.",
+  "minimum_chrome_version": "125",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Lista UG",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "permissions": ["storage", "declarativeNetRequestWithHostAccess"],
+  "host_permissions": [
+    "https://store.steampowered.com/*",
+    "https://p2p.binance.com/*",
+    "https://open.er-api.com/*",
+    "https://latest.currency-api.pages.dev/*",
+    "https://cdn.jsdelivr.net/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://store.steampowered.com/*"],
+      "js": [
+        "src/shared/config.js",
+        "src/shared/calc.js",
+        "src/shared/icons.js",
+        "src/content/detect.js",
+        "src/content/render.js",
+        "src/content/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["fonts/martian-mono-latin.woff2", "fonts/martian-mono-latin-ext.woff2"],
+      "matches": ["https://store.steampowered.com/*"]
+    }
+  ]
+}

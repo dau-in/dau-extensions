@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ajustes de Ukrainian Gang Extension</title>
+  <link rel="stylesheet" href="../shared/fonts.css">
+  <link rel="stylesheet" href="../shared/receipt.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body class="ug-root">
+  <main class="ug-paper ug-receipt">
+    <header class="ug-receipt__head">
+      <span id="emblem"></span>
+      <span class="ug-brand__name">Ukrainian Gang Extension</span>
+      <h1 class="ug-receipt__title">Ajustes</h1>
+      <p class="ug-meta">Se guardan solos al cambiarlos.</p>
+    </header>
+
+    <form class="ug-form" id="form" novalidate>
+      <div class="ug-rule" aria-hidden="true"></div>
+      <fieldset class="ug-group">
+        <legend>Tienda</legend>
+        <div class="ug-row">
+          <div class="ug-row__label">
+            <label for="storeInUah">Mostrar la tienda en ₴</label>
+            <span class="ug-help" id="storeInUah-help">Añade <span class="ug-num">?cc=ua</span> a las direcciones de la tienda para que Steam enseñe los precios de Ucrania sin iniciar sesión.</span>
+          </div>
+          <input class="ug-check" type="checkbox" id="storeInUah" name="storeInUah" aria-describedby="storeInUah-help">
+        </div>
+        <div class="ug-row">
+          <div class="ug-row__label">
+            <label for="listTags">Mostrar talones en búsquedas y listas</label>
+            <span class="ug-help" id="listTags-help">Bs y HK$ al lado de cada precio, con el detalle al pasar el ratón.</span>
+          </div>
+          <input class="ug-check" type="checkbox" id="listTags" name="listTags" aria-describedby="listTags-help">
+        </div>
+        <div class="ug-row">
+          <div class="ug-row__label">
+            <label for="regionCompare">Comparar regiones en el ticket</label>
+            <span class="ug-help" id="regionCompare-help">Una tabla plegada con el precio en otras regiones, pasado a USD.</span>
+          </div>
+          <input class="ug-check" type="checkbox" id="regionCompare" name="regionCompare" aria-describedby="regionCompare-help">
+        </div>
+      </fieldset>
+
+      <div class="ug-rule" aria-hidden="true"></div>
+      <fieldset class="ug-group">
+        <legend>Binance P2P</legend>
+        <fieldset class="ug-row">
+          <legend class="ug-row__label"><span>Precio que se usa</span><span class="ug-help" id="p2pSide-help">Comprar es lo normal: pagas bolívares y recibes USDT.</span></legend>
+          <div class="ug-choices">
+            <label class="ug-choice"><input type="radio" name="p2pSide" value="BUY" aria-describedby="p2pSide-help">Comprar USDT</label>
+            <label class="ug-choice"><input type="radio" name="p2pSide" value="SELL" aria-describedby="p2pSide-help">Vender USDT</label>
+          </div>
+        </fieldset>
+        <div class="ug-row">
+          <div class="ug-row__label">
+            <label for="p2pAds">Anuncios que se promedian</label>
+            <span class="ug-help" id="p2pAds-help">Entre 1 y 20. Más anuncios dan una tasa más estable.</span>
+          </div>
+          <span class="ug-input-wrap"><input class="ug-input" type="text" inputmode="numeric" id="p2pAds" name="p2pAds" autocomplete="off" aria-describedby="p2pAds-help" data-min="1" data-max="20" data-int></span>
+          <p class="ug-field__error" id="p2pAds-error" hidden>Escribe un número entero entre 1 y 20.</p>
+        </div>
+      </fieldset>
+
+      <div class="ug-rule" aria-hidden="true"></div>
+      <fieldset class="ug-group">
+        <legend>Tarjetas de Hong Kong</legend>
+        <div class="ug-row">
+          <div class="ug-row__label">
+            <label for="hkCardPriceUsdt">Precio real de una tarjeta de HK$100</label>
+            <span class="ug-help" id="hkCardPriceUsdt-help">En USDT. Con 0 se usa la tasa de mercado más el recargo.</span>
+          </div>
+          <span class="ug-input-wrap"><input class="ug-input" type="text" inputmode="decimal" id="hkCardPriceUsdt" name="hkCardPriceUsdt" autocomplete="off" aria-describedby="hkCardPriceUsdt-help" data-min="0" data-max="1000"><span aria-hidden="true">USDT</span></span>
+          <p class="ug-field__error" id="hkCardPriceUsdt-error" hidden>Escribe un precio en USDT entre 0 y 1000, por ejemplo 13,40.</p>
+        </div>
+        <div class="ug-row">
+          <div class="ug-row__label">
+            <label for="sellerSurchargePct">Recargo del vendedor de tarjetas</label>
+            <span class="ug-help" id="sellerSurchargePct-help">Se suma a la tasa de mercado. Con 0, sin recargo.</span>
+          </div>
+          <span class="ug-input-wrap"><input class="ug-input" type="text" inputmode="decimal" id="sellerSurchargePct" name="sellerSurchargePct" autocomplete="off" aria-describedby="sellerSurchargePct-help" data-min="0" data-max="100"><span aria-hidden="true">%</span></span>
+          <p class="ug-field__error" id="sellerSurchargePct-error" hidden>Escribe un porcentaje entre 0 y 100, por ejemplo 3,5.</p>
+        </div>
+        <div class="ug-row">
+          <div class="ug-row__label">
+            <label for="uahPerHkdManual">₴ que acredita Steam por cada HK$</label>
+            <span class="ug-help" id="uahPerHkdManual-help">Steam no publica su tasa. Con 0 se usa la de mercado.</span>
+          </div>
+          <span class="ug-input-wrap"><input class="ug-input" type="text" inputmode="decimal" id="uahPerHkdManual" name="uahPerHkdManual" autocomplete="off" aria-describedby="uahPerHkdManual-help" data-min="0" data-max="1000"><span aria-hidden="true">₴</span></span>
+          <p class="ug-field__error" id="uahPerHkdManual-error" hidden>Escribe un número entre 0 y 1000, por ejemplo 5,35.</p>
+        </div>
+        <div class="ug-row">
+          <div class="ug-row__label">
+            <label for="suggestCards">Sugerir tarjetas</label>
+            <span class="ug-help" id="suggestCards-help">Propone qué tarjetas de Hong Kong comprar para cubrir el precio.</span>
+          </div>
+          <input class="ug-check" type="checkbox" id="suggestCards" name="suggestCards" aria-describedby="suggestCards-help">
+        </div>
+      </fieldset>
+
+      <div class="ug-rule" aria-hidden="true"></div>
+      <fieldset class="ug-group">
+        <legend>Regiones a comparar</legend>
+        <div class="ug-choices" id="regions"></div>
+      </fieldset>
+
+      <div class="ug-rule" aria-hidden="true"></div>
+      <section class="ug-group" aria-labelledby="rates-title">
+        <h2 class="ug-group__title" id="rates-title">Tasas actuales</h2>
+        <dl class="ug-sub" id="rates"></dl>
+        <div class="ug-toolbar"><span></span><button class="ug-link" type="button" id="refresh">Actualizar tasas</button></div>
+      </section>
+
+      <p class="ug-saved" id="saved" role="status"></p>
+    </form>
+  </main>
+  <script src="../shared/config.js"></script>
+  <script src="../shared/calc.js"></script>
+  <script src="../shared/icons.js"></script>
+  <script src="../content/render.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

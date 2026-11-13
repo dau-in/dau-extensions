@@ -1,0 +1,28 @@
+html {
+  background: var(--ug-desk);
+}
+
+body {
+  width: 360px;
+  margin: 0;
+  padding: 12px;
+  background: var(--ug-desk);
+}
+
+h1.ug-receipt__title {
+  margin: 0;
+}
+
+.ug-desc small.ug-note-red {
+  color: var(--ug-red);
+}
+
+.ug-desc a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ug-copy-status {
+  min-height: 0;
+}
