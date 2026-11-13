@@ -1,0 +1,20 @@
+{
+  "name": "steam-precios-ug",
+  "private": true,
+  "type": "module",
+  "description": "Herramientas de desarrollo y pruebas. La extensión no tiene paso de compilación: se carga esta carpeta tal cual.",
+  "scripts": {
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "test:red": "node --test \"tests/live/*.test.mjs\"",
+    "test:e2e": "node tests/e2e/run.mjs",
+    "test:todo": "npm test && npm run test:red && npm run test:e2e",
+    "iconos": "node tools/iconos.mjs",
+    "paleta": "node diseno/exploracion/paleta.mjs"
+  },
+  "devDependencies": {
+    "apca-w3": "^0.1.9",
+    "axe-core": "^4.14.0",
+    "culori": "^4.0.1",
+    "puppeteer-core": "^25.17.0"
+  }
+}
