@@ -84,12 +84,16 @@
     return out
   }
 
-  // Líneas 01–04 de un precio en ₴.
-  function conversionLines(uah, view, { numbered = true } = {}) {
+  // "al mes", "al año", "cada 3 meses" para las suscripciones.
+  const periodLabel = (months) => (months === 1 ? 'al mes' : months === 12 ? 'al año' : `cada ${months} meses`)
+
+  // Líneas 01–04 de un precio en ₴. Con months, el precio es de una suscripción.
+  function conversionLines(uah, view, { numbered = true, months = null } = {}) {
     const c = calc.convertUah(uah, view.rates)
     const r = view.rates
     const n = (k) => (numbered ? k : '')
-    const lines = [line({ n: n('01'), label: 'Precio en Steam', note: 'Región Ucrania', amount: calc.formatUah(uah) })]
+    const period = months ? periodLabel(months) : null
+    const lines = [line({ n: n('01'), label: period ? `Precio ${period}` : 'Precio en Steam', note: 'Región Ucrania', amount: calc.formatUah(uah) })]
     if (!c) return { lines, conv: null }
     const hkNote = r.manualUahPerHkd ? `${calc.formatRate(r.uahPerHkd, 3)}₴ por HK$, a mano` : `${calc.formatRate(r.uahPerHkd, 3)}₴ por HK$`
     const usdtNote = r.manualCard
@@ -99,10 +103,11 @@
         : `${calc.formatRate(r.usdtPerHkd, 4)} USDT por HK$`
     lines.push(line({ n: n('02'), label: 'Tarjeta Hong Kong', note: hkNote, amount: calc.formatHkd(c.hkd) }))
     lines.push(line({ n: n('03'), label: 'En Binance', note: usdtNote, amount: calc.formatUsdt(c.usdt) }))
+    const totalLabel = period ? `Total ${period} en bolívares` : 'Total en bolívares'
     lines.push(
       c.ves != null
-        ? line({ n: n('04'), label: 'Total en bolívares', note: `${calc.formatVes(r.vesPerUsdt)} por USDT`, amount: calc.formatVes(c.ves), cls: 'ug-line--total' })
-        : line({ n: n('04'), label: 'Total en bolívares', note: 'Sin tasa de Binance', amount: '—', cls: 'ug-line--total ug-line--empty' }),
+        ? line({ n: n('04'), label: totalLabel, note: `${calc.formatVes(r.vesPerUsdt)} por USDT`, amount: calc.formatVes(c.ves), cls: 'ug-line--total' })
+        : line({ n: n('04'), label: totalLabel, note: 'Sin tasa de Binance', amount: '—', cls: 'ug-line--total ug-line--empty' }),
     )
     return { lines, conv: c }
   }
@@ -233,7 +238,7 @@
         'header',
         { class: 'ug-head' },
         svg(icons.emblem()),
-        h('div', { class: 'ug-brand' }, h('span', { class: 'ug-brand__name', text: 'Ukrainian Gang Extension' }), h('span', { class: 'ug-brand__sub', text: 'Ticket de compra en Steam Ucrania' })),
+        h('div', { class: 'ug-brand' }, h('span', { class: 'ug-brand__name', text: 'Ukrainian Gang Extension' }), h('span', { class: 'ug-brand__sub', text: item.months ? 'Suscripción en Steam Ucrania' : 'Ticket de compra en Steam Ucrania' })),
         h('div', { class: 'ug-meta' }, h('span', { class: 'ug-num', text: `Nº ${item.id}` }), h('span', { class: 'ug-num', text: view.at ? calc.formatDateTime(view.at) : 'Sin tasas' })),
       ),
       h('div', { class: 'ug-title' }, h('span', { class: 'ug-title__name', text: item.name }), item.edition ? h('span', { class: 'ug-title__ed', text: item.edition }) : null),
@@ -241,7 +246,8 @@
 
     const bottom = h('div', { class: 'ug-paper ug-piece--bottom' }, svg(icons.emblem({ className: 'ug-watermark', ink: false })))
     const uah = m.price ? m.price.final / 100 : null
-    const regionsAllowed = m.settings.regionCompare && item.type !== 'bundle' && m.settings.regions.length > 0
+    // Las suscripciones no se comparan: cada región tiene sus propios planes.
+    const regionsAllowed = m.settings.regionCompare && item.type !== 'bundle' && !item.months && m.settings.regions.length > 0
     const regions = () =>
       regionsAllowed ? regionsBlock({ uaUah: m.status === 'priced' ? uah : null, uaFormatted: uah != null ? calc.formatUah(uah) : '', load: m.loadRegions, regionCount: m.settings.regions.length }) : null
 
@@ -270,7 +276,7 @@
         lines.push(line({ label: 'Precio normal', amount: calc.formatUah(m.price.initial / 100), cls: 'ug-line--muted' }))
         lines.push(line({ label: `Descuento del ${m.price.discountPercent} %`, amount: calc.formatUah(-(m.price.initial - m.price.final) / 100), cls: 'ug-line--discount' }))
       }
-      const { lines: conv, conv: c } = conversionLines(uah, view)
+      const { lines: conv, conv: c } = conversionLines(uah, view, { months: item.months })
       bottom.append(h('ol', { class: 'ug-lines', 'aria-label': 'De grivnas a bolívares' }, lines, conv))
       bottom.append(...ratesNotices(view, m.onRetryRates))
       if (m.settings.suggestCards && c) {

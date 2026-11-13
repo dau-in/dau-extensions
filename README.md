@@ -5,7 +5,7 @@ Extensiones de navegador personales. Cada una vive en su propia carpeta dentro d
 | Extensión | Qué hace | Estado |
 |-----------|----------|--------|
 | [`tumblr-no-wall`](extensions/tumblr-no-wall/) | Quita el muro de "Sign up or log in" de Tumblr, devuelve el scroll y añade un visor HD y un botón para guardar en Pinterest. | En uso, v1.2.0 |
-| [`steam-precios-ug`](extensions/steam-precios-ug/) | **Ukrainian Gang Extension.** Precios de Steam Ucrania en HK$, USDT y bolívares según Binance P2P, con ticket por edición, comparación de regiones y Lista UG para el grupo. | En uso, v0.1.0 |
+| [`steam-precios-ug`](extensions/steam-precios-ug/) | **Ukrainian Gang Extension.** Precios de Steam Ucrania en HK$, USDT y bolívares según Binance P2P, con ticket por edición, comparación de regiones y Lista UG para el grupo. | En uso, v0.1.1 |
 
 ## Instalar una extensión
 

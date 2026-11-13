@@ -21,8 +21,31 @@
     const quoted = t.match(/[«"“„]([^»"”]+)[»"”]/)
     if (quoted) return quoted[1].trim()
     return t
-      .replace(/^(buy|comprar|pre-?purchase|precomprar|reservar|pre-?order|play|jugar a|jugar)\s+/i, '')
+      .replace(/^(subscribe to|suscr[ií]bete a|suscribirse a|buy|comprar|pre-?purchase|precomprar|reservar|pre-?order|play|jugar a|jugar)\s+/i, '')
       .trim()
+  }
+
+  // Suscripción: "259₴ / month", "auto-renewed every 1 month(s)". Devuelve los
+  // meses de cada cobro, o null si el bloque no es una suscripción.
+  function subscriptionMonths(block) {
+    const note = block.querySelector('.game_purchase_subscription')
+    if (!note && !/subscription/.test(block.className)) return null
+    const t = text(note ?? block)
+    const m = t.match(/(?:every|cada)\s+(\d+)\s*(?:month|mes)/i)
+    if (m) return Number(m[1])
+    if (/\b(year|año)\b/i.test(t)) return 12
+    return 1
+  }
+
+  // "Incluye 3 juegos" a partir de la lista de contenido del paquete.
+  function includesNote(block) {
+    // Ids únicos: Steam puede repetir enlaces (lista recortada y completa).
+    const ids = new Set()
+    for (const a of block.querySelectorAll('.package_contents a[href*="/app/"]')) {
+      const m = a.getAttribute('href').match(/\/app\/(\d+)/)
+      if (m) ids.add(m[1])
+    }
+    return ids.size > 1 ? `Incluye ${ids.size} juegos` : ''
   }
 
   // Nombre del juego de la ficha.
@@ -30,17 +53,19 @@
     return text(doc.querySelector('#appHubAppName, .apphub_AppName')) || cleanTitle(text(doc.querySelector('.page_title_area h2, .pageheader')))
   }
 
-  // Edición a partir del título del bloque y del nombre del juego.
+  // Edición a partir del título del bloque y del nombre del juego. Devuelve
+  // null si el bloque es otra cosa, como un paquete con otros juegos.
   function editionFrom(title, name) {
-    if (!name) return ''
+    if (!name) return null
     if (title === name) return 'Juego base'
-    const lower = title.toLowerCase()
-    if (lower.startsWith(name.toLowerCase())) {
+    if (title.toLowerCase().startsWith(name.toLowerCase())) {
       const rest = title.slice(name.length).replace(/^[\s:–—-]+/, '').trim()
       return rest || 'Juego base'
     }
-    return title
+    return null
   }
+
+  const periodText = (months) => (months === 1 ? 'Suscripción mensual' : months === 12 ? 'Suscripción anual' : `Suscripción cada ${months} meses`)
 
   // Precio que muestra la página, solo si está en grivnas.
   function readPagePrice(scope) {
@@ -77,14 +102,19 @@
       const id = Number(sub ?? bundle)
       if (!Number.isInteger(id) || id <= 0) continue
       const title = cleanTitle(text(block.querySelector('h1, h2, .title')))
+      const months = subscriptionMonths(block)
+      const edition = editionFrom(title, name)
       out.push({
         block,
         anchor: block.closest('.game_area_purchase_game_wrapper') ?? block,
         type: sub ? 'sub' : 'bundle',
         id,
         title,
-        name: name || title,
-        edition: editionFrom(title, name),
+        // Una edición del juego lleva el nombre del juego; un paquete con otros
+        // juegos o una suscripción lleva su propio título.
+        name: edition != null && !months ? name : title,
+        edition: months ? periodText(months) : (edition ?? includesNote(block)),
+        months,
         pagePrice: readPagePrice(block),
       })
     }
@@ -140,5 +170,5 @@
     return out.filter((i) => (seen.has(i.el) ? false : seen.add(i.el)))
   }
 
-  UG.detect = { HOST_TAG, DONE_ATTR, pageInfo, cleanTitle, appName, editionFrom, readPagePrice, purchaseBlocks, itemOf, listItems }
+  UG.detect = { HOST_TAG, DONE_ATTR, pageInfo, cleanTitle, appName, editionFrom, subscriptionMonths, readPagePrice, purchaseBlocks, itemOf, listItems }
 })()

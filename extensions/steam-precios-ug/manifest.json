@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Ukrainian Gang Extension",
   "short_name": "UG Extension",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Precios de Steam Ucrania en HK$, USDT y bolívares (Binance P2P), con una lista de compra para el grupo.",
   "minimum_chrome_version": "125",
   "icons": {

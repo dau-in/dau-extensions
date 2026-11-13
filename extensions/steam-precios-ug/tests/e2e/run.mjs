@@ -632,6 +632,37 @@ await step('Pantalla estrecha (420 px): el ticket se adapta sin desbordarse', as
   await narrow.close()
 })
 
+await step('Suscripción y paquete con otros juegos (GTA San Andreas): cada ticket con su nombre', async () => {
+  const gta = await newPage()
+  await steamCookies(gta)
+  await gta.goto(`${STORE}/app/1547000/`, { waitUntil: 'domcontentloaded' })
+  const blocks = await gta.$$eval('.game_area_purchase_game input[name="subid"]', (e) => e.length)
+  await waitTickets(gta, blocks)
+  const tickets = await gta.$$eval('ug-extension-ui', (hs) =>
+    hs
+      .map((h) => h.shadowRoot?.querySelector('.ug-ticket'))
+      .filter(Boolean)
+      .map((t) => ({
+        name: t.querySelector('.ug-title__name')?.textContent,
+        edition: t.querySelector('.ug-title__ed')?.textContent,
+        text: t.textContent,
+        regions: Boolean(t.querySelector('.ug-regions')),
+      })),
+  )
+  const sub = tickets.find((t) => /Suscripción/.test(t.edition ?? ''))
+  if (sub) {
+    assert.equal(sub.name, 'GTA+')
+    assert.match(sub.text, /Precio al mes/)
+    assert.match(sub.text, /Total al mes en bolívares/)
+    assert.equal(sub.regions, false, 'la suscripción no compara regiones')
+  }
+  const trilogy = tickets.find((t) => /Trilogy/.test(t.name ?? ''))
+  assert.ok(trilogy, `falta el ticket de la Trilogy: ${JSON.stringify(tickets.map((t) => [t.name, t.edition]))}`)
+  assert.equal(trilogy.edition, 'Incluye 3 juegos')
+  await shot(gta, '19-ficha-suscripcion', 'ug-extension-ui')
+  await gta.close()
+})
+
 await step('Ficha con DLC: talones en la lista de contenido descargable', async () => {
   const dlc = await newPage()
   await steamCookies(dlc)

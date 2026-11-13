@@ -211,6 +211,7 @@ function cleanItem(raw) {
     appId: Number(raw.appId) || null,
     name: text(raw.name, 200) || `${type} ${id}`,
     edition: text(raw.edition, 200),
+    months: Number.isInteger(raw.months) && raw.months > 0 ? raw.months : null,
     url: /^https:\/\/store\.steampowered\.com\//.test(raw.url ?? '') ? raw.url : null,
     lastUah: Number.isFinite(raw.lastUah) ? raw.lastUah : null,
     addedAt: Date.now(),

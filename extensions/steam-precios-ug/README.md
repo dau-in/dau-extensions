@@ -2,7 +2,7 @@
 
 Extensión para el grupo familiar de Steam **Ukrainian Gang**, que compra con cuentas de región Ucrania pagando con bolívares. Al lado de cada precio de la tienda muestra cuánto cuesta en ₴, en HK$ (para saber qué tarjeta de Hong Kong comprar), en USDT y en bolívares según Binance P2P.
 
-Versión 0.1.0. Funciona en `store.steampowered.com`, sin iniciar sesión y con cualquier VPN.
+Versión 0.1.1. Funciona en `store.steampowered.com`, sin iniciar sesión y con cualquier VPN.
 
 ## Qué hace
 
@@ -66,7 +66,8 @@ Steam cambia su HTML. Si algo deja de aparecer, el arreglo va en `src/content/de
 
 - **Tipo de página:** la ruta `/app/<id>`, `/sub/<id>` o `/bundle/<id>`.
 - **Ediciones comprables:** cada `.game_area_purchase_game` con `input[name="subid"]` (paquete) o `input[name="bundleid"]` (bundle). El ticket va después de `.game_area_purchase_game_wrapper`.
-- **Nombre de la edición:** el título del bloque, por ejemplo `Comprar «ELDEN RING Shadow of the Erdtree Edition»`, sin el verbo y sin la etiqueta «BUNDLE (?)». Si empieza por el nombre del juego (`#appHubAppName`), se queda el resto; si no queda nada, la edición se llama «Juego base».
+- **Nombre de la edición:** el título del bloque, por ejemplo `Comprar «ELDEN RING Shadow of the Erdtree Edition»`, sin el verbo y sin la etiqueta «BUNDLE (?)». Si empieza por el nombre del juego (`#appHubAppName`), el ticket lleva el nombre del juego y el resto es la edición; si no queda nada, la edición se llama «Juego base». Si es otra cosa, como un paquete con otros juegos («Grand Theft Auto: The Trilogy»), el ticket lleva el título del bloque y, como edición, «Incluye N juegos», contados en `.package_contents`.
+- **Suscripciones:** el bloque tiene la clase `game_area_purchase_game_dropdown_subscription` o un `.game_purchase_subscription` con el período («every 1 month(s)»). El ticket dice «Precio al mes» y no compara regiones.
 - **Precio en la página:** `[data-price-final]` en céntimos, pero solo si el texto lleva `₴`. Si no, el precio sale de la API de Steam. Así funciona igual con VPN o con la tienda en otra moneda.
 - **Ficha sin ediciones**, como un juego gratis, no disponible o por salir: se pide el precio de la app y el ticket va al principio de `#game_area_purchase`.
 - **Listas:** cada `.discount_final_price` o `.game_area_dlc_price` dentro de un elemento con `data-ds-itemkey` (`App_620`, `Sub_440408`, `Bundle_232`) o con `data-ds-appid`, `data-ds-packageid` o `data-ds-bundleid`. Los precios en 0 o sin cifras («Gratis») no llevan talón. Un `MutationObserver` cubre lo que Steam carga después, como el scroll infinito de la búsqueda.
@@ -86,7 +87,7 @@ npm run test:todo    # las tres
 
 La prueba de extremo a extremo usa el Chrome instalado; con `CHROME_PATH` se puede elegir otro, por ejemplo Brave. Con `HEADFUL=1` se ve el navegador.
 
-Recorre 37 pasos y guarda capturas en `tests/e2e/capturas/`. Entre ellos:
+Recorre 38 pasos y guarda capturas en `tests/e2e/capturas/`. Entre ellos:
 
 - la redirección a `?cc=ua`;
 - un ticket por edición, con las cifras comprobadas contra el cálculo;
@@ -95,6 +96,7 @@ Recorre 37 pasos y guarda capturas en `tests/e2e/capturas/`. Entre ellos:
 - la comparación de regiones;
 - todos los estados del ticket, con Steam y Binance caídos de forma simulada;
 - los talones y el tooltip con ratón y teclado, incluido el scroll infinito y la lista de DLC;
+- una ficha con suscripción y con un paquete de otros juegos (GTA San Andreas);
 - el popup completo, con saldo, copiar resumen, deshacer y lista vacía;
 - los ajustes, incluidos los valores no válidos;
 - la pantalla estrecha y el alto contraste;

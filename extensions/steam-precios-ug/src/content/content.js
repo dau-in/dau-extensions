@@ -143,7 +143,7 @@
       const { root } = mount((host) => b.anchor.after(host))
       tickets.push({
         root,
-        item: { type: b.type, id: b.id, appId, name: b.name, edition: b.edition },
+        item: { type: b.type, id: b.id, appId, name: b.name, edition: b.edition, months: b.months },
         pagePrice: b.pagePrice,
         status: 'loading',
         price: null,
