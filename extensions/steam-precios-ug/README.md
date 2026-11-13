@@ -31,6 +31,8 @@ Version 0.1.2. Works on `store.steampowered.com`, without signing in and with an
   - regions to compare;
   - suggest gift cards (off by default).
 
+![The settings page](docs/settings.png)
+
 ## Install
 
 1. Open `brave://extensions` (or `chrome://extensions`, `edge://extensions`).
