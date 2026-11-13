@@ -1,5 +1,5 @@
 (() => {
-  // Tumblr ofusca sus clases CSS, así que detectamos el muro por su texto.
+  // Tumblr obfuscates its CSS classes, so the wall is detected by its text.
   const PHRASES = [
     'sign up or log in',
     'continue with google',
@@ -11,13 +11,13 @@
     'continuar con google',
     'únete a más de 100 millones',
   ];
-  // Fragmentos cortos para filtrar rápido los nodos de texto candidatos.
+  // Short fragments to quickly filter the candidate text nodes.
   const FRAGMENTS = ['sign up', 'continue with', 'join over', '100 million', 'twitter/x', 'regístrate', 'continuar con', 'únete'];
 
   const norm = (s) => s.replace(/\s+/g, ' ').trim().toLowerCase();
 
-  // El texto suele venir partido en varios nodos ("Join over " + "100 million"),
-  // así que miramos el texto completo de los ancestros cercanos.
+  // The text often comes split across several nodes ("Join over " + "100 million"),
+  // so we look at the full text of the nearby ancestors.
   function matchesPhrase(el) {
     for (let i = 0; el && i < 4; i++, el = el.parentElement) {
       const t = el.textContent;
@@ -28,8 +28,8 @@
     return false;
   }
 
-  // Primer contenedor fijo hacia arriba que NO contenga posts.
-  // Así ocultamos el popup y la barra inferior, pero no el panel de un blog.
+  // First fixed container going up that does NOT contain posts.
+  // That hides the popup and the bottom bar, but not an open blog panel.
   function findWall(el) {
     for (; el && el !== document.body; el = el.parentElement) {
       if (getComputedStyle(el).position !== 'fixed') continue;
@@ -55,14 +55,14 @@
     }
     targets.forEach((el) => el.classList.add('tnw-hidden'));
 
-    // El popup trae su propio <style>body{overflow:hidden}</style>, que sigue
-    // aplicando aunque el popup esté oculto. Lo desactivamos.
+    // The popup brings its own <style>body{overflow:hidden}</style>, which keeps
+    // applying even while the popup is hidden. We disable it.
     document.querySelectorAll('.tnw-hidden style').forEach((s) => {
       s.media = 'not all';
     });
 
-    // Deshacer el bloqueo de scroll / interacción que ponen los modales,
-    // pero solo si no hay un panel legítimo (p. ej. un blog) abierto.
+    // Undo the scroll / interaction lock that modals add,
+    // but only when no legitimate panel (e.g. a blog) is open.
     const legitDialog = [...document.querySelectorAll('[role="dialog"]')].some(
       (d) => !d.closest('.tnw-hidden') && d.offsetParent !== null
     );

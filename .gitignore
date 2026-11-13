@@ -10,6 +10,7 @@ desktop.ini
 .env
 .env.*
 
-# Capturas que genera la prueba de extremo a extremo
-extensions/steam-precios-ug/tests/e2e/capturas/
-extensions/steam-precios-ug/tools/.iconos.html
+# Screenshots written by the end-to-end test
+extensions/steam-precios-ug/tests/e2e/screenshots/
+extensions/steam-precios-ug/tools/.icons.html
+extensions/steam-precios-ug/tools/.icons-preview.png

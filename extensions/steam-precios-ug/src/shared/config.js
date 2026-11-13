@@ -1,5 +1,5 @@
-// Ajustes, regiones y constantes. Sin DOM ni APIs del navegador: se carga en
-// el service worker, el content script, el popup, los ajustes y en Node.
+// Settings, regions and constants. No DOM and no browser APIs: loaded by the
+// service worker, the content script, the popup, the settings page and Node.
 ;(() => {
   const UG = (globalThis.UG ??= {})
 
@@ -43,7 +43,7 @@
     suggestCards: false,
   })
 
-  // Denominaciones de las tarjetas de Steam de Hong Kong, en HK$.
+  // Steam Hong Kong gift card denominations, in HK$.
   const HK_DENOMINATIONS = Object.freeze([40, 50, 80, 100, 200, 300, 400, 500, 600, 750, 1000])
 
   const CACHE_MS = Object.freeze({
@@ -53,7 +53,7 @@
     region: 6 * HOUR,
   })
 
-  // A partir de esta antigüedad la UI avisa de que una tasa es vieja.
+  // From this age on the UI warns that a rate is old.
   const STALE_MS = Object.freeze({
     p2p: 30 * MIN,
     fx: 36 * HOUR,
@@ -65,7 +65,7 @@
   }
   const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n))
 
-  // Devuelve unos ajustes completos y válidos a partir de lo que haya guardado.
+  // Returns complete, valid settings from whatever was stored.
   function normalizeSettings(raw) {
     const r = raw && typeof raw === 'object' ? raw : {}
     const known = new Set(REGIONS.map((x) => x.cc))

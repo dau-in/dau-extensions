@@ -1,4 +1,4 @@
-// Popup: la Lista UG como un ticket largo.
+// Popup: the Lista UG as a long receipt.
 ;(async () => {
   const { calc, icons, render, dom } = UG
   const { h, svg, icon, line, retryButton } = dom
@@ -20,11 +20,11 @@
     undo: null,
   }
 
-  // ---- Datos ----------------------------------------------------------------------
+  // ---- Data ------------------------------------------------------------------------
 
   const itemLabel = (i) => [i.name, i.edition && i.edition !== 'Juego base' ? i.edition : ''].filter(Boolean).join(' ')
 
-  // Precio en ₴ de cada juego: el de la API o, si no hay, el que tenía al añadirlo.
+  // Price in ₴ of each game: the API's, or the one it had when it was added.
   function priceOf(i) {
     const r = state.prices[i.key]
     if (r?.status === 'priced' && r.currency === 'UAH') return { uah: r.final / 100, discount: r.discountPercent, source: 'api' }
@@ -53,7 +53,7 @@
     }
   }
 
-  // ---- Acciones ----------------------------------------------------------------------
+  // ---- Actions ---------------------------------------------------------------------
 
   async function removeItem(item) {
     const before = state.list
@@ -104,7 +104,7 @@
 
   const render_ratesView = () => render.ratesView(state.ratesState)
 
-  // ---- Saldo -------------------------------------------------------------------------
+  // ---- Wallet ----------------------------------------------------------------------
 
   function parseAmount(raw) {
     const s = String(raw ?? '').trim().replace(/[\s ₴]/g, '')
@@ -185,7 +185,7 @@
         h('div', { class: 'ug-rule', 'aria-hidden': 'true' }),
       )
 
-      // Total y conversión
+      // Total and conversion
       if (loading) {
         parts.push(h('ol', { class: 'ug-lines', 'aria-busy': 'true' }, [1, 2, 3].map(() => h('li', { class: 'ug-line' }, h('span'), h('span', { class: 'ug-skeleton' }), h('span', { class: 'ug-skeleton ug-skeleton--amt' })))))
       } else if (total != null) {
@@ -194,7 +194,7 @@
         parts.push(h('ol', { class: 'ug-lines', 'aria-label': 'Total, de grivnas a bolívares' }, lines))
         parts.push(...render.ratesNotices(view, refreshRates))
 
-        // Saldo
+        // Wallet
         const walletInput = h('input', {
           class: 'ug-input',
           id: 'wallet',
@@ -247,11 +247,11 @@
       }
     }
 
-    // Deshacer
+    // Undo
     const undoBtn = state.undo ? h('button', { class: 'ug-link', type: 'button', onclick: undo }, 'Deshacer') : null
     parts.push(h('div', { class: 'ug-snackbar', role: 'status', hidden: !state.undo }, state.undo ? [h('span', { text: state.undo.text }), undoBtn] : []))
 
-    // Tasas
+    // Rates
     const p2p = view.p2p
     const fx = view.fx
     parts.push(
@@ -284,7 +284,7 @@
     draw()
   }
 
-  // ---- Arranque -----------------------------------------------------------------------
+  // ---- Start-up ----------------------------------------------------------------------
 
   const [list, settings, stored] = await Promise.all([send('list:get'), send('settings:get'), chrome.storage.local.get('wallet')])
   state.list = list
@@ -294,7 +294,7 @@
   await Promise.all([loadRates(false), loadPrices(true)])
   draw()
 
-  // Si la lista cambia en otra pestaña mientras el popup está abierto.
+  // If the list changes in another tab while the popup is open.
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes.list && !state.undo) {
       state.list = Array.isArray(changes.list.newValue) ? changes.list.newValue : []

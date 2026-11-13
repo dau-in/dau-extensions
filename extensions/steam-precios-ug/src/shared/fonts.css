@@ -1,5 +1,5 @@
-/* Martian Mono (SIL OFL 1.1), incluida en la extensión. En la tienda la
-   registra content.js con la misma familia. */
+/* Martian Mono (SIL OFL 1.1), bundled with the extension. Inside the store,
+   content.js registers the same family on the page. */
 @font-face {
   font-family: "UG Martian Mono";
   src: url("../../fonts/martian-mono-latin.woff2") format("woff2");

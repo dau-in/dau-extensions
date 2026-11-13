@@ -1,5 +1,5 @@
-// Service worker: todas las peticiones de red, la caché, la Lista UG y la
-// regla que añade ?cc=ua a la tienda.
+// Service worker: every network request, the cache, the Lista UG and the
+// rule that adds ?cc=ua to the store.
 importScripts('shared/config.js', 'shared/calc.js', 'shared/sources.js')
 
 const { config, sources } = UG
@@ -12,31 +12,31 @@ async function getSettings() {
   return config.normalizeSettings(await get(local, 'settings'))
 }
 
-// ---- Red --------------------------------------------------------------------
+// ---- Network ------------------------------------------------------------------
 
 async function fetchJson(source, url, init = {}) {
   let res
   try {
     res = await fetch(url, { ...init, credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(15000) })
   } catch (e) {
-    throw new sources.SourceError(source, e?.name === 'TimeoutError' ? 'Tiempo de espera agotado' : 'Sin conexión')
+    throw new sources.SourceError(source, e?.name === 'TimeoutError' ? 'Timed out' : 'No connection')
   }
   if (!res.ok) throw new sources.SourceError(source, `HTTP ${res.status}`)
   try {
     return await res.json()
   } catch {
-    throw new sources.SourceError(source, 'Respuesta no válida')
+    throw new sources.SourceError(source, 'Invalid response')
   }
 }
 
-// Una sola petición en vuelo por clave.
+// Only one request in flight per key.
 const inflight = new Map()
 function once(key, fn) {
   if (!inflight.has(key)) inflight.set(key, fn().finally(() => inflight.delete(key)))
   return inflight.get(key)
 }
 
-// Ejecuta tareas de a `limit` a la vez.
+// Runs tasks `limit` at a time.
 async function pool(items, limit, fn) {
   const out = []
   let i = 0
@@ -50,7 +50,7 @@ async function pool(items, limit, fn) {
   return out
 }
 
-// ---- Tasas --------------------------------------------------------------------
+// ---- Rates --------------------------------------------------------------------
 
 async function getP2P(settings, force) {
   const cached = await get(local, 'cache:p2p')
@@ -86,7 +86,7 @@ async function getFx(force) {
       }
     }
     if (cached) return { ...cached, stale: true, error: lastError?.message }
-    throw lastError ?? new sources.SourceError('fx', 'Sin fuentes de tasas')
+    throw lastError ?? new sources.SourceError('fx', 'No exchange rate source answered')
   })
 }
 
@@ -104,7 +104,7 @@ async function getRates(force = false) {
   }
 }
 
-// ---- Precios de Steam ------------------------------------------------------------
+// ---- Steam prices --------------------------------------------------------------
 
 const priceKey = (cc, type, id) => `price:${cc}:${type}:${id}`
 
@@ -172,7 +172,7 @@ async function getRegionPrices({ type, id }) {
     getFx(false).catch(() => null),
     ...settings.regions.map(async (cc) => {
       const r = await getPrices([{ type, id }], { cc })
-      // El nombre de la región va después: los datos del paquete traen su propio name.
+      // The region name goes last: package data carries its own name.
       return { ...r[`${type}:${id}`], cc, name: config.regionName(cc) }
     }),
   ])
@@ -202,7 +202,7 @@ async function updateBadge(list) {
 function cleanItem(raw) {
   const type = ['app', 'sub', 'bundle'].includes(raw?.type) ? raw.type : null
   const id = Number(raw?.id)
-  if (!type || !Number.isInteger(id) || id <= 0) throw new Error('Elemento no válido')
+  if (!type || !Number.isInteger(id) || id <= 0) throw new Error('Invalid item')
   const text = (v, max) => (typeof v === 'string' ? v.trim().slice(0, max) : '')
   return {
     key: `${type}:${id}`,
@@ -218,7 +218,7 @@ function cleanItem(raw) {
   }
 }
 
-// ---- Estilos para el Shadow DOM --------------------------------------------------------
+// ---- Styles for the Shadow DOM ---------------------------------------------------------
 
 let stylesText = null
 async function getStyles() {
@@ -226,11 +226,11 @@ async function getStyles() {
   return stylesText
 }
 
-// ---- Tienda en ₴ (?cc=ua) ---------------------------------------------------------------
+// ---- Store in ₴ (?cc=ua) ---------------------------------------------------------------
 
-// Solo páginas de la tienda; nunca la API, el carrito ni el inicio de sesión.
-// Una regla simple por sección: una sola expresión regular con todas excede
-// el límite de memoria de Chrome para reglas regex.
+// Store pages only; never the API, the cart or the login page.
+// One simple rule per section: a single regular expression covering all of
+// them exceeds Chrome's memory limit for regex rules.
 const STORE_PATHS = ['app/', 'sub/', 'bundle/', 'search/', 'specials', 'genre/', 'tags/', 'category/', 'publisher/', 'developer/', 'curator/', 'dlc/', 'explore/', 'charts/', 'sale/', 'franchise/']
 const STORE_FILTERS = ['|https://store.steampowered.com/|', ...STORE_PATHS.map((p) => `|https://store.steampowered.com/${p}`)]
 const RULE_IDS = STORE_FILTERS.map((_, i) => i + 1)
@@ -266,7 +266,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.settings) syncStoreRule(config.normalizeSettings(changes.settings.newValue))
 })
 
-// ---- Mensajes ------------------------------------------------------------------------------
+// ---- Messages --------------------------------------------------------------------------------
 
 const handlers = {
   'rates:get': ({ force }) => getRates(Boolean(force)),

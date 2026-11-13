@@ -2,7 +2,7 @@
   display: none !important;
 }
 
-/* --- Botones Pin / HD --- */
+/* --- Pin / HD buttons --- */
 .tnw-hover {
   display: none;
   position: fixed;
@@ -33,7 +33,7 @@
   background: #ad081b;
 }
 
-/* --- Visor --- */
+/* --- Viewer --- */
 .tnw-viewer {
   display: none;
   position: fixed;

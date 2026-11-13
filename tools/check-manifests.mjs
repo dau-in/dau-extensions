@@ -1,6 +1,6 @@
-// Revisa el manifest.json de cada extensión: que sea JSON válido, Manifest V3,
-// con versión x.y.z y que existan todos los archivos que referencia.
-// Uso: node tools/revisar-manifiestos.mjs
+// Checks each extension's manifest.json: valid JSON, Manifest V3, a version
+// shaped x.y.z, and that every file it references exists.
+// Usage: node tools/check-manifests.mjs
 import { readdir, readFile, access } from 'node:fs/promises'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -23,12 +23,12 @@ for (const name of (await readdir(root, { withFileTypes: true })).filter((d) => 
   try {
     m = JSON.parse(await readFile(join(dir, 'manifest.json'), 'utf8'))
   } catch (e) {
-    report(`manifest.json no se puede leer: ${e.message}`)
+    report(`cannot read manifest.json: ${e.message}`)
     continue
   }
-  if (m.manifest_version !== 3) report(`manifest_version es ${m.manifest_version}, no 3`)
-  if (!/^\d+\.\d+\.\d+$/.test(m.version ?? '')) report(`versión «${m.version}» no tiene la forma x.y.z`)
-  if (!(await exists(join(dir, 'README.md')))) report('falta README.md')
+  if (m.manifest_version !== 3) report(`manifest_version is ${m.manifest_version}, not 3`)
+  if (!/^\d+\.\d+\.\d+$/.test(m.version ?? '')) report(`version "${m.version}" is not shaped x.y.z`)
+  if (!(await exists(join(dir, 'README.md')))) report('README.md is missing')
 
   const files = new Set()
   const add = (f) => f && !f.includes('*') && files.add(f)
@@ -41,8 +41,8 @@ for (const name of (await readdir(root, { withFileTypes: true })).filter((d) => 
   for (const cs of m.content_scripts ?? []) [...(cs.js ?? []), ...(cs.css ?? [])].forEach(add)
   for (const war of m.web_accessible_resources ?? []) (war.resources ?? []).forEach(add)
 
-  for (const f of files) if (!(await exists(join(dir, f)))) report(`no existe ${f}`)
-  if (!mine) console.log(`  ✔ v${m.version}, ${files.size} archivos referenciados`)
+  for (const f of files) if (!(await exists(join(dir, f)))) report(`${f} does not exist`)
+  if (!mine) console.log(`  ✔ v${m.version}, ${files.size} referenced files`)
 }
 
 process.exitCode = problems ? 1 : 0

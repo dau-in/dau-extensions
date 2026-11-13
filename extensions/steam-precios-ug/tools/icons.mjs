@@ -1,5 +1,5 @@
-// Genera icons/icon-{16,32,48,128}.png a partir del emblema (src/shared/icons.js)
-// renderizándolo en Chrome. Uso: npm run iconos
+// Renders icons/icon-{16,32,48,128}.png from the emblem (src/shared/icons.js)
+// in Chrome. Usage: npm run icons
 import { mkdir, writeFile, rm } from 'node:fs/promises'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, join } from 'node:path'
@@ -33,8 +33,8 @@ const html = `<!doctype html><html><head><style>
     .join('')}
 </body></html>`
 
-// La página se carga desde un archivo para que pueda leer la fuente local.
-const tmp = join(root, 'tools', '.iconos.html')
+// The page loads from a file so it can read the local font.
+const tmp = join(root, 'tools', '.icons.html')
 await writeFile(tmp, html)
 const browser = await puppeteer.launch({ executablePath: chromePath(), headless: true })
 try {
@@ -42,7 +42,7 @@ try {
   await page.goto(pathToFileURL(tmp).href, { waitUntil: 'load' })
   await page.evaluate(() => document.fonts.ready)
   const loaded = await page.evaluate(() => document.fonts.check('800 27px "UG Martian Mono"'))
-  if (!loaded) throw new Error('No cargó Martian Mono')
+  if (!loaded) throw new Error('Martian Mono did not load')
   await mkdir(join(root, 'icons'), { recursive: true })
   for (const s of [128, 48, 32, 16]) {
     const el = await page.$(`#i${s}`)
@@ -50,9 +50,9 @@ try {
     await writeFile(join(root, 'icons', `icon-${s}.png`), png)
     console.log(`icons/icon-${s}.png`)
   }
-  if (process.argv.includes('--muestra')) {
+  if (process.argv.includes('--preview')) {
     await page.setViewport({ width: 400, height: 300, deviceScaleFactor: 2 })
-    await page.screenshot({ path: join(root, 'tools', '.muestra-iconos.png') })
+    await page.screenshot({ path: join(root, 'tools', '.icons-preview.png') })
   }
 } finally {
   await browser.close()

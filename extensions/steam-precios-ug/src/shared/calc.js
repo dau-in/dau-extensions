@@ -1,21 +1,21 @@
-// Conversiones y formatos. Puro: sin DOM ni APIs del navegador.
+// Conversions and formats. Pure: no DOM and no browser APIs.
 //
-//   ₴ por HK$     = fx.UAH / fx.HKD              (o el valor manual)
-//   USDT por HK$  = (1 / fx.HKD) × (1 + recargo)  (o precio real de la tarjeta de HK$100 ÷ 100)
-//   HK$           = ₴ / (₴ por HK$)
-//   USDT          = HK$ × (USDT por HK$)
-//   Bs            = USDT × tasa P2P
+//   ₴ per HK$     = fx.UAH / fx.HKD                    (or the manual value)
+//   USDT per HK$  = (1 / fx.HKD) × (1 + surcharge)      (or the real price of the HK$100 card ÷ 100)
+//   HK$           = ₴ / (₴ per HK$)
+//   USDT          = HK$ × (USDT per HK$)
+//   Bs            = USDT × P2P rate
 ;(() => {
   const UG = (globalThis.UG ??= {})
 
   const NBSP = ' '
   const MINUS = '−'
 
-  // ---- Números ---------------------------------------------------------------
+  // ---- Numbers ---------------------------------------------------------------
 
   const group = (intStr, sep) => intStr.replace(/\B(?=(\d{3})+(?!\d))/g, sep)
 
-  // Formatea un número con separador de miles y decimal propios.
+  // Formats a number with its own thousands and decimal separators.
   function formatNumber(n, { decimals = 2, thousands = '.', decimal = ',', trimZeros = false } = {}) {
     if (!Number.isFinite(n)) return '—'
     const negative = n < 0 && Math.abs(n) >= 0.5 * 10 ** -decimals
@@ -25,19 +25,19 @@
     return (negative ? MINUS : '') + body
   }
 
-  // 1 799₴ · 240₴ · 1 799,50₴ (los céntimos solo si los hay)
+  // 1 799₴, 240₴, 1 799,50₴ (cents only when there are any)
   const formatUah = (uah) => formatNumber(uah, { decimals: 2, thousands: NBSP, decimal: ',', trimZeros: true }) + '₴'
   // HK$ 336.45
   const formatHkd = (hkd, decimals = 2) => `HK$${NBSP}` + formatNumber(hkd, { decimals, thousands: ',', decimal: '.' })
   // 44,54 USDT
   const formatUsdt = (usdt, decimals = 2) => formatNumber(usdt, { decimals, thousands: '.', decimal: ',' }) + `${NBSP}USDT`
-  // Bs 48.016,87 · Bs 48.017
+  // Bs 48.016,87 or Bs 48.017
   const formatVes = (ves, decimals = 2) => `Bs${NBSP}` + formatNumber(ves, { decimals, thousands: '.', decimal: ',' })
   // $43.25
   const formatUsd = (usd) => '$' + formatNumber(usd, { decimals: 2, thousands: ',', decimal: '.' })
   // 5,347
   const formatRate = (n, decimals) => formatNumber(n, { decimals, thousands: '.', decimal: ',' })
-  // +39 % · −17 % · 0 %
+  // +39 %, −17 %, 0 %
   function formatPercent(p) {
     if (!Number.isFinite(p)) return '—'
     const r = Math.round(p)
@@ -45,8 +45,8 @@
     return (r > 0 ? '+' : MINUS) + Math.abs(r) + `${NBSP}%`
   }
 
-  // Precio en otra moneda, para la comparación de regiones. Las monedas con
-  // "$" llevan su prefijo (US$, HK$, CA$…) para no confundirse entre sí.
+  // A price in another currency, for the region comparison. Dollar-like
+  // currencies keep their prefix (US$, HK$, CA$…) so they are not confused.
   const DOLLAR_LIKE = new Set(['USD', 'CAD', 'AUD', 'NZD', 'SGD', 'MXN', 'TWD', 'CLP', 'COP', 'ARS'])
   function formatMoney(amount, currency) {
     if (currency === 'HKD') return formatHkd(amount)
@@ -59,7 +59,7 @@
     }
   }
 
-  // "1 799₴", "240,00₴", "1.799,50 ₴" → 1799, 240, 1799.5. Null si no hay ₴.
+  // "1 799₴", "240,00₴", "1.799,50 ₴" → 1799, 240, 1799.5. Null without ₴.
   function parseUahText(text) {
     if (typeof text !== 'string' || !text.includes('₴')) return null
     const m = text.match(/(\d[\d\s  .,]*)\s*₴/)
@@ -77,10 +77,10 @@
     return Number.isFinite(n) ? n : null
   }
 
-  // ---- Tasas y conversión ------------------------------------------------------
+  // ---- Rates and conversion ------------------------------------------------------
 
-  // fx: tasas con base USD ({ UAH: 41.6, HKD: 7.78, … }). p2p: Bs por USDT.
-  // Devuelve null si falta algún dato imprescindible.
+  // fx: USD-based rates ({ UAH: 41.6, HKD: 7.78, … }). p2p: Bs per USDT.
+  // Returns null when an essential value is missing.
   function deriveRates({ fx, p2p, settings }) {
     const s = settings ?? UG.config.DEFAULTS
     const UAH = fx?.UAH
@@ -100,7 +100,7 @@
     }
   }
 
-  // ₴ → { uah, hkd, usdt, ves, usd }. ves es null si no hay tasa P2P.
+  // ₴ → { uah, hkd, usdt, ves, usd }. ves is null without a P2P rate.
   function convertUah(uah, rates) {
     if (!rates || !Number.isFinite(uah)) return null
     const hkd = uah / rates.uahPerHkd
@@ -109,18 +109,18 @@
     return { uah, hkd, usdt, ves, usd: uah / rates.uahPerUsd }
   }
 
-  // Promedio de los N primeros anuncios de P2P.
+  // Average of the first N P2P ads.
   function averagePrice(prices, n) {
     const list = prices.filter((p) => Number.isFinite(p) && p > 0).slice(0, n)
     if (!list.length) return null
     return list.reduce((a, b) => a + b, 0) / list.length
   }
 
-  // ---- Tarjetas sugeridas ------------------------------------------------------
+  // ---- Suggested cards ------------------------------------------------------
 
-  // La combinación de tarjetas que cubre el monto con el menor sobrante y,
-  // a igual sobrante, con menos tarjetas. Devuelve las denominaciones de
-  // mayor a menor, o null si el monto no es válido.
+  // The combination of cards that covers the amount with the least left over
+  // and, with equal leftovers, the fewest cards. Returns the denominations from
+  // largest to smallest, or null if the amount is not valid.
   function suggestCards(hkd, denominations = UG.config.HK_DENOMINATIONS) {
     if (!(hkd > 0) || hkd > 50000) return null
     const target = Math.ceil(hkd - 1e-9)
@@ -147,11 +147,11 @@
     return null
   }
 
-  // ---- Comparación de regiones ---------------------------------------------------
+  // ---- Region comparison ---------------------------------------------------
 
-  // entries: [{ cc, status, currency, final (en céntimos), formatted }]
-  // Devuelve las filas ordenadas de más barata a más cara, con las regiones sin
-  // precio al final, y la posición de Ucrania.
+  // entries: [{ cc, status, currency, final (in cents), formatted }]
+  // Returns the rows sorted from cheapest to most expensive, with unpriced
+  // regions last, plus where Ukraine stands.
   function compareRegions({ uaUah, entries, fx }) {
     const uaUsd = fx?.UAH > 0 ? uaUah / fx.UAH : null
     const rows = entries.map((e) => {
@@ -173,12 +173,12 @@
     return { uaUsd, rows, cheaper, pricedCount: priced.length }
   }
 
-  // ---- Texto ----------------------------------------------------------------------
+  // ---- Text ----------------------------------------------------------------------
 
   const plural = new Intl.PluralRules('es')
   const pluralize = (n, one, other) => `${n} ${plural.select(n) === 'one' ? one : other}`
 
-  // "hace 3 min", "hace 2 h", "hace 1 día"
+  // "hace 3 min", "hace 2 h", "hace 1 día" (3 min ago, 2 h ago, 1 day ago)
   function timeAgo(ts, now = Date.now()) {
     if (!Number.isFinite(ts)) return 'sin fecha'
     const s = Math.max(0, Math.round((now - ts) / 1000))
@@ -191,13 +191,13 @@
   }
 
   const pad = (n) => String(n).padStart(2, '0')
-  // 12/11/2026 14:32 en hora local
+  // 12/11/2026 14:32 in local time
   function formatDateTime(ts) {
     const d = new Date(ts)
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
   }
 
-  // Texto para WhatsApp o Discord:
+  // Text for WhatsApp or Discord:
   // ELDEN RING 1 799₴ + Portal 2 240₴ = 2 039₴ ≈ HK$ 381 ≈ 50,5 USDT ≈ Bs 54.423
   function summaryText(items, rates) {
     const priced = items.filter((i) => Number.isFinite(i.uah))

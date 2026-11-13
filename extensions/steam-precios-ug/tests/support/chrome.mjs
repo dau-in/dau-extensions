@@ -1,5 +1,5 @@
-// Ruta del Chrome con el que se prueban la extensión y se generan los iconos.
-// Se puede cambiar con la variable CHROME_PATH (por ejemplo, para usar Brave).
+// Path to the Chrome used to test the extension and to render the icons.
+// Override it with CHROME_PATH (for example, to use Brave).
 import { existsSync } from 'node:fs'
 
 const CANDIDATES = [
@@ -14,6 +14,6 @@ const CANDIDATES = [
 
 export function chromePath() {
   const found = CANDIDATES.find((p) => p && existsSync(p))
-  if (!found) throw new Error('No se encontró Chrome. Define CHROME_PATH con la ruta del ejecutable.')
+  if (!found) throw new Error('Chrome not found. Set CHROME_PATH to the path of the executable.')
   return found
 }

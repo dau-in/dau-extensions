@@ -4,7 +4,7 @@ import '../support/load-shared.mjs'
 
 const { sources } = globalThis.UG
 
-test('Binance P2P: petición y promedio', () => {
+test('Binance P2P: request and average', () => {
   const { url, init } = sources.p2pRequest({ side: 'SELL', rows: 50 })
   assert.equal(url, 'https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search')
   const body = JSON.parse(init.body)
@@ -15,11 +15,11 @@ test('Binance P2P: petición y promedio', () => {
   const r = sources.parseP2P(json, 5)
   assert.equal(r.price, 1070)
   assert.equal(r.count, 3)
-  assert.throws(() => sources.parseP2P({ data: null }, 5), /anuncios/)
-  assert.throws(() => sources.parseP2P({ data: [] }, 5), /precios/)
+  assert.throws(() => sources.parseP2P({ data: null }, 5), /no ads/)
+  assert.throws(() => sources.parseP2P({ data: [] }, 5), /no valid prices/)
 })
 
-test('tasas: las tres fuentes', () => {
+test('exchange rates: the three sources', () => {
   const [er, pages, jsd] = sources.FX_SOURCES
   const a = sources.parseFx(er, { result: 'success', time_last_update_unix: 1763000000, rates: { USD: 1, UAH: 41.6, HKD: 7.78, KZT: 520 } })
   assert.equal(a.rates.UAH, 41.6)
@@ -31,11 +31,11 @@ test('tasas: las tres fuentes', () => {
   assert.equal(b.source, 'currency-api.pages.dev')
   assert.ok(sources.parseFx(jsd, { usd: { uah: 41, hkd: 7.8 } }))
   assert.throws(() => sources.parseFx(er, { result: 'error' }), /error/)
-  assert.throws(() => sources.parseFx(pages, { usd: { uah: 41 } }), /UAH o HKD/)
+  assert.throws(() => sources.parseFx(pages, { usd: { uah: 41 } }), /no UAH or HKD/)
 })
 
-test('Steam appdetails: con precio, gratis y no disponible', () => {
-  // Respuesta real del 2026-11-13 (cc=ua).
+test('Steam appdetails: priced, free and unavailable', () => {
+  // Real response from 2026-11-13 (cc=ua).
   const json = {
     620: { success: true, data: { price_overview: { currency: 'UAH', initial: 24000, final: 24000, discount_percent: 0, initial_formatted: '', final_formatted: '240₴' } } },
     1245620: { success: true, data: { price_overview: { currency: 'UAH', initial: 179900, final: 179900, discount_percent: 0, final_formatted: '1 799₴' } } },
@@ -51,7 +51,7 @@ test('Steam appdetails: con precio, gratis y no disponible', () => {
   assert.equal(sources.appDetailsUrl([620, 570], 'ua'), 'https://store.steampowered.com/api/appdetails?appids=620,570&cc=ua&filters=price_overview')
 })
 
-test('Steam packagedetails y bundles', () => {
+test('Steam packagedetails and bundles', () => {
   const pkg = { 440408: { success: true, data: { name: 'ELDEN RING', apps: [{ id: 1245620 }], price: { currency: 'UAH', initial: 179900, final: 107900, discount_percent: 40 } } } }
   const p = sources.parsePackage(pkg, 440408)
   assert.equal(p.status, 'priced')

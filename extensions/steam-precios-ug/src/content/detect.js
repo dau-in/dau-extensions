@@ -1,5 +1,5 @@
-// Qué hay en la página de Steam: ediciones comprables y precios en listas.
-// Solo lee el DOM; no lo cambia. Si Steam cambia su HTML, el arreglo va aquí.
+// What is on the Steam page: purchasable editions and prices in lists.
+// Only reads the DOM, never changes it. When Steam changes its HTML, fix it here.
 ;(() => {
   const UG = (globalThis.UG ??= {})
 
@@ -14,9 +14,9 @@
 
   const text = (el) => (el?.textContent ?? '').replace(/\s+/g, ' ').trim()
 
-  // "Comprar «ELDEN RING»" · "Buy ELDEN RING" · "Pre-Purchase X" → nombre limpio.
+  // "Comprar «ELDEN RING»" / "Buy ELDEN RING" / "Pre-Purchase X" → clean name.
   function cleanTitle(raw) {
-    // Los bundles traen una etiqueta con tooltip: "Portal Bundle BUNDLE (?)".
+    // Bundles carry a label with a tooltip: "Portal Bundle BUNDLE (?)".
     const t = (raw ?? '').replace(/\s+/g, ' ').replace(/\s*\b(bundle|paquete|lote)\s*\(\?\)\s*$/i, '').trim()
     const quoted = t.match(/[«"“„]([^»"”]+)[»"”]/)
     if (quoted) return quoted[1].trim()
@@ -25,8 +25,8 @@
       .trim()
   }
 
-  // Suscripción: "259₴ / month", "auto-renewed every 1 month(s)". Devuelve los
-  // meses de cada cobro, o null si el bloque no es una suscripción.
+  // Subscription: "259₴ / month", "auto-renewed every 1 month(s)". Returns the
+  // months between charges, or null if the block is not a subscription.
   function subscriptionMonths(block) {
     const note = block.querySelector('.game_purchase_subscription')
     if (!note && !/subscription/.test(block.className)) return null
@@ -37,9 +37,9 @@
     return 1
   }
 
-  // "Incluye 3 juegos" a partir de la lista de contenido del paquete.
+  // "Incluye 3 juegos" (includes 3 games) from the package contents list.
   function includesNote(block) {
-    // Ids únicos: Steam puede repetir enlaces (lista recortada y completa).
+    // Unique ids: Steam can repeat links (capsules plus the text list).
     const ids = new Set()
     for (const a of block.querySelectorAll('.package_contents a[href*="/app/"]')) {
       const m = a.getAttribute('href').match(/\/app\/(\d+)/)
@@ -48,13 +48,13 @@
     return ids.size > 1 ? `Incluye ${ids.size} juegos` : ''
   }
 
-  // Nombre del juego de la ficha.
+  // Name of the game on the page.
   function appName(doc) {
     return text(doc.querySelector('#appHubAppName, .apphub_AppName')) || cleanTitle(text(doc.querySelector('.page_title_area h2, .pageheader')))
   }
 
-  // Edición a partir del título del bloque y del nombre del juego. Devuelve
-  // null si el bloque es otra cosa, como un paquete con otros juegos.
+  // Edition from the block title and the game name. Returns null when the
+  // block is something else, such as a package with other games.
   function editionFrom(title, name) {
     if (!name) return null
     if (title === name) return 'Juego base'
@@ -67,14 +67,14 @@
 
   const periodText = (months) => (months === 1 ? 'Suscripción mensual' : months === 12 ? 'Suscripción anual' : `Suscripción cada ${months} meses`)
 
-  // Precio que muestra la página, solo si está en grivnas.
+  // Price shown on the page, only when it is in hryvnias.
   function readPagePrice(scope) {
     const priceEl =
       scope.querySelector('.discount_block[data-price-final]') ??
       scope.querySelector('.game_purchase_price[data-price-final]') ??
       scope.querySelector('[data-price-final]')
     if (!priceEl) {
-      // DLC sin descuento: el precio va como texto suelto, "159₴".
+      // DLC without a discount: the price is plain text, "159₴".
       const uah = UG.calc.parseUahText(text(scope.querySelector('.game_area_dlc_price') ?? scope))
       return uah != null ? { currency: 'UAH', final: Math.round(uah * 100), initial: Math.round(uah * 100), discountPercent: 0 } : null
     }
@@ -92,7 +92,7 @@
     }
   }
 
-  // Ediciones comprables de una ficha (juego, paquete o bundle).
+  // Purchasable editions on a game page (game, package or bundle).
   function purchaseBlocks(doc) {
     const name = appName(doc)
     const out = []
@@ -110,8 +110,8 @@
         type: sub ? 'sub' : 'bundle',
         id,
         title,
-        // Una edición del juego lleva el nombre del juego; un paquete con otros
-        // juegos o una suscripción lleva su propio título.
+        // An edition of the game takes the game's name; a package with other
+        // games or a subscription takes its own title.
         name: edition != null && !months ? name : title,
         edition: months ? periodText(months) : (edition ?? includesNote(block)),
         months,
@@ -123,7 +123,7 @@
 
   const KEY_ATTRS = '[data-ds-itemkey], [data-ds-appid], [data-ds-packageid], [data-ds-bundleid]'
 
-  // App_620 · Sub_440408 · Bundle_232, o los data-ds-* sueltos.
+  // App_620 / Sub_440408 / Bundle_232, or the loose data-ds-* attributes.
   function itemOf(el) {
     const key = el.getAttribute('data-ds-itemkey')
     const m = key?.match(/^(App|Sub|Bundle)_(\d+)$/)
@@ -138,12 +138,12 @@
     return null
   }
 
-  // Elementos de lista con precio (búsqueda, ofertas, DLC, portada).
+  // List items with a price (search, specials, DLC, front page).
   function listItems(root) {
     const out = []
     for (const priceEl of root.querySelectorAll('.discount_final_price, .game_area_dlc_price')) {
       if (priceEl.closest(HOST_TAG) || priceEl.closest('.game_area_purchase_game')) continue
-      // Un DLC con descuento ya se cuenta por su .discount_final_price.
+      // A discounted DLC is already counted through its .discount_final_price.
       const plainDlc = priceEl.matches('.game_area_dlc_price')
       if (plainDlc && priceEl.querySelector('.discount_final_price')) continue
       const el = priceEl.closest(KEY_ATTRS)
@@ -152,20 +152,20 @@
       if (!item) continue
       const block = priceEl.closest('.discount_block') ?? priceEl
       const attr = block.getAttribute('data-price-final') ?? el.getAttribute('data-price-final')
-      if (attr != null && Number(attr) === 0) continue // gratis: sin talón
+      if (attr != null && Number(attr) === 0) continue // free: no stub
       if (attr == null && !/\d/.test(text(priceEl))) continue // "Gratis", "Free"
       const title = text(el.querySelector('.title, .tab_item_name, .game_area_dlc_name, .search_name .title')) || ''
       out.push({
         el,
         anchor: block,
-        // En la fila de DLC el talón va dentro de la columna de precio, debajo.
+        // In a DLC row the stub goes inside the price column, below the price.
         place: plainDlc ? 'append' : 'after',
         ...item,
         title,
         pagePrice: readPagePrice(plainDlc ? el : (block.parentElement ?? block)),
       })
     }
-    // Un elemento puede tener más de un precio: se usa el primero.
+    // An item can have more than one price: the first one wins.
     const seen = new Set()
     return out.filter((i) => (seen.has(i.el) ? false : seen.add(i.el)))
   }

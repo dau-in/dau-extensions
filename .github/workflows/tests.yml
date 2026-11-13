@@ -1,8 +1,8 @@
-# Revisa los manifiestos y corre las pruebas unitarias en cada push y pull
-# request. Las pruebas de red y de extremo a extremo se corren a mano
-# (npm run test:red, npm run test:e2e): dependen de Binance, de Steam y de un
-# navegador, y fallarían por motivos ajenos al código.
-name: Pruebas
+# Checks the manifests and runs the unit tests on every push and pull
+# request. The live and end-to-end tests are run by hand
+# (npm run test:live, npm run test:e2e): they depend on Binance, Steam and a
+# browser, and would fail for reasons that have nothing to do with the code.
+name: Tests
 
 on:
   push:
@@ -13,23 +13,23 @@ permissions:
   contents: read
 
 jobs:
-  manifiestos:
-    name: Manifiestos
+  manifests:
+    name: Manifests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-      - run: node tools/revisar-manifiestos.mjs
+      - run: node tools/check-manifests.mjs
 
-  unitarias:
-    name: Unitarias (${{ matrix.extension }})
+  unit:
+    name: Unit tests (${{ matrix.extension }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        # Extensiones con package.json y pruebas. Añade aquí las nuevas.
+        # Extensions with a package.json and tests. Add new ones here.
         extension: [steam-precios-ug]
     defaults:
       run:

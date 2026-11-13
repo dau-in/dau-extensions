@@ -1,4 +1,4 @@
-// SVG del emblema y de los iconos. Marcado fijo, sin datos de la página.
+// SVG for the emblem and the icons. Fixed markup, never page data.
 ;(() => {
   const UG = (globalThis.UG ??= {})
 
@@ -7,8 +7,8 @@
 
   let uid = 0
 
-  // Emblema "talón": se dibuja como un sello de goma, con la tinta algo
-  // gastada. crop recorta el lienzo a la forma del talón.
+  // "Ticket stub" emblem: drawn like a rubber stamp, with slightly worn ink.
+  // crop trims the canvas to the shape of the stub.
   function emblem({ className = 'ug-emblem', crop = true, ink = true } = {}) {
     const id = `ug-ink-${++uid}`
     const viewBox = crop ? '11 27 98 66' : '0 0 120 120'
@@ -32,8 +32,8 @@
     </svg>`
   }
 
-  // Versión pequeña (talones y el icono de 16 a 48 px): talón relleno con UG.
-  // Las barras de grivna solo desde 48 px; más pequeñas emborronan las letras.
+  // Small version (list stubs and the 16–48 px icons): a filled stub with UG.
+  // The hryvnia bars only from 48 px up; smaller, they smudge the letters.
   const smallMark = (className = '', { bars = false } = {}) =>
     `<svg class="${className}" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
       <path d="M1 7h30v5.5a3.5 3.5 0 0 0 0 7V25H1v-5.5a3.5 3.5 0 0 0 0-7Z" fill="currentColor"/>
@@ -60,7 +60,7 @@
   const icon = (name, extra = '') =>
     `<svg class="ug-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"${extra ? ` data-when="${extra}"` : ''}>${PATHS[name]}</svg>`
 
-  // Código de barras decorativo a partir de una cadena de dígitos.
+  // Decorative barcode from a string of digits.
   function barcode(code) {
     let x = 0
     let rects = ''

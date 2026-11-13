@@ -1,8 +1,8 @@
 (() => {
-  // Botones al pasar el ratón por una imagen de un post:
-  //   HD  → visor con la versión más grande que ofrece Tumblr (la última del srcset)
-  //   Pin → guarda en Pinterest la imagen en alta, enlazada al post original
-  const MIN_SIZE = 120; // ignora avatares e iconos
+  // Buttons shown when hovering an image in a post:
+  //   HD  → viewer with the largest version Tumblr offers (the last one in srcset)
+  //   Pin → saves the full-size image to Pinterest, linked to the original post
+  const MIN_SIZE = 120; // ignore avatars and icons
 
   function largestSrc(img) {
     let best = img.currentSrc || img.src;
@@ -21,12 +21,12 @@
   function isPostImage(img) {
     if (!img.closest('article')) return false;
     if (!/media\.tumblr\.com/.test(img.currentSrc || img.src)) return false;
-    if (/_c1\//.test(img.currentSrc || img.src)) return false; // avatares recortados
+    if (/_c1\//.test(img.currentSrc || img.src)) return false; // cropped avatars
     const r = img.getBoundingClientRect();
     return r.width >= MIN_SIZE && r.height >= MIN_SIZE;
   }
 
-  // Enlace permanente del post (tumblr.com/<blog>/<id>/...) y una descripción.
+  // Permalink of the post (tumblr.com/<blog>/<id>/...) and a description.
   function postInfo(img) {
     const article = img.closest('article');
     const links = article ? [...article.querySelectorAll('a[href]')].map((a) => a.href) : [];
@@ -42,7 +42,7 @@
     return { permalink, description };
   }
 
-  // .pnj y .gifv a veces se sirven como página HTML; .png y .gif siempre son imagen.
+  // .pnj and .gifv are sometimes served as an HTML page; .png and .gif are always images.
   function pinnableMedia(url) {
     return url.replace(/\.pnj(\?|$)/, '.png$1').replace(/\.gifv(\?|$)/, '.gif$1');
   }
@@ -56,12 +56,12 @@
     window.open(url, 'tnw-pin', 'width=760,height=640');
   }
 
-  // --- Botones flotantes (un solo grupo, se recoloca sobre la imagen activa) ---
+  // --- Floating buttons (a single group, moved over the active image) ---
   const hover = document.createElement('div');
   hover.className = 'tnw-hover';
   hover.innerHTML = `
-    <button class="tnw-btn tnw-pin-btn" data-act="pin" title="Guardar en Pinterest">Pin</button>
-    <button class="tnw-btn tnw-hd-btn" data-act="hd" title="Ver en resolución completa">HD</button>`;
+    <button class="tnw-btn tnw-pin-btn" data-act="pin" title="Save to Pinterest">Pin</button>
+    <button class="tnw-btn tnw-hd-btn" data-act="hd" title="View at full resolution">HD</button>`;
   let current = null;
 
   function showHover(img) {
@@ -78,7 +78,7 @@
 
   document.addEventListener('mouseover', (e) => {
     if (hover.contains(e.target)) return;
-    // Tumblr a veces pone capas encima de la imagen, así que buscamos bajo el cursor.
+    // Tumblr sometimes puts layers over the image, so we look under the cursor.
     const img = e.target.tagName === 'IMG'
       ? e.target
       : document.elementsFromPoint(e.clientX, e.clientY).find((el) => el.tagName === 'IMG');
@@ -87,7 +87,7 @@
   }, true);
   window.addEventListener('scroll', hideHover, { passive: true });
 
-  // Que Tumblr no reciba el clic (abriría su propio lightbox).
+  // Keep the click from Tumblr (it would open its own lightbox).
   for (const type of ['pointerdown', 'mousedown', 'mouseup', 'click']) {
     hover.addEventListener(type, (e) => {
       e.preventDefault();
@@ -100,7 +100,7 @@
     });
   }
 
-  // --- Visor ---
+  // --- Viewer ---
   const viewer = document.createElement('div');
   viewer.className = 'tnw-viewer';
   viewer.innerHTML = `
@@ -108,7 +108,7 @@
       <span class="tnw-viewer-info"></span>
       <button class="tnw-btn tnw-pin-btn tnw-viewer-pin">Guardar en Pinterest</button>
       <a class="tnw-viewer-post" target="_blank" rel="noopener">Ver post</a>
-      <button class="tnw-viewer-close" title="Cerrar (Esc)">✕</button>
+      <button class="tnw-viewer-close" title="Close (Esc)">✕</button>
     </div>
     <div class="tnw-viewer-stage"><img class="tnw-viewer-img" alt=""></div>`;
   const vImg = viewer.querySelector('.tnw-viewer-img');
@@ -120,9 +120,9 @@
     hideHover();
     viewerData = { url, info };
     viewer.classList.remove('tnw-zoomed');
-    vInfo.textContent = 'Cargando…';
+    vInfo.textContent = 'Loading…';
     vImg.onload = () => {
-      vInfo.textContent = `${vImg.naturalWidth} × ${vImg.naturalHeight} — clic para zoom`;
+      vInfo.textContent = `${vImg.naturalWidth} × ${vImg.naturalHeight} — click to zoom`;
     };
     vImg.src = url;
     vPost.href = info.permalink;

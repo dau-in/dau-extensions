@@ -1,33 +1,35 @@
 # tumblr-no-wall
 
-Extensión para navegar Tumblr sin cuenta.
+Browsing Tumblr without an account.
 
-- Oculta el popup y la barra de "Sign up or log in" y devuelve el scroll de la página.
-- Al pasar el ratón por una imagen de un post aparecen dos botones:
-  - **HD** abre un visor con la versión más grande que ofrece Tumblr. Clic en la imagen para hacer zoom y `Esc` para cerrar.
-  - **Pin** guarda la imagen en alta en Pinterest, enlazada al post original, con el blog y las etiquetas como descripción.
+![Tumblr with the login wall removed](docs/hero.png)
 
-Versión 1.2.0. Funciona en `*.tumblr.com`.
+- Hides the "Sign up or log in" popup and bar and gives scrolling back to the page.
+- Hovering an image in a post shows two buttons:
+  - **HD** opens a viewer with the largest version Tumblr offers. Click the image to zoom and press `Esc` to close.
+  - **Pin** saves the full-size image to Pinterest, linked to the original post, with the blog and the tags as the description.
 
-## Instalar
+Version 1.2.1. Works on `*.tumblr.com`. The UI uses Tumblr's own language, so its few labels are in English and in Spanish.
 
-Carga esta carpeta como extensión sin empaquetar (ver el README de la raíz).
+## Install
 
-## Archivos
+Load this folder as an unpacked extension (see the repository README).
 
-| Archivo | Qué hace |
-|---------|----------|
-| `manifest.json` | Manifest V3. Inyecta los scripts en `document_start` sin pedir permisos extra. |
-| `content.js` | Detecta y oculta el muro de login, y quita el bloqueo de scroll e `inert`. |
-| `viewer.js` | Botones HD y Pin sobre las imágenes, y el visor a pantalla completa. |
-| `content.css` | Estilos de lo anterior, todos con el prefijo `tnw-`. |
+## Files
 
-## Cómo detecta el muro
+| File | What it does |
+|------|--------------|
+| `manifest.json` | Manifest V3. Injects the scripts at `document_start` without asking for extra permissions. |
+| `content.js` | Finds and hides the login wall, and removes the scroll lock and `inert`. |
+| `viewer.js` | HD and Pin buttons over images, and the full-screen viewer. |
+| `content.css` | Styles for the above, all prefixed `tnw-`. |
 
-Tumblr ofusca sus clases CSS, así que el muro se reconoce **por su texto** (`sign up or log in`, `continue with google`, `regístrate o inicia sesión`…). Se oculta el primer contenedor `position: fixed` que lo envuelve y que no contiene posts, para no tapar el panel de un blog abierto.
+## How it detects the wall
 
-Si Tumblr cambia esos textos, hay que actualizar `PHRASES` y `FRAGMENTS` en `content.js`.
+Tumblr obfuscates its CSS classes, so the wall is recognised **by its text** (`sign up or log in`, `continue with google`, `regístrate o inicia sesión`). The first `position: fixed` container around that text is hidden, as long as it holds no posts, so an open blog panel is not covered.
 
-## Historial
+If Tumblr changes those texts, update `PHRASES` and `FRAGMENTS` in `content.js`.
 
-`archive/tumblr/inject.json` es una versión anterior del script de `content.js`, pensada para un inyector de JS y CSS. No desactiva el `<style>` con `overflow: hidden` que trae el popup, así que esta extensión la supera.
+## History
+
+`archive/tumblr/inject.json` is an earlier version of the `content.js` script, written for a JS and CSS injector. It does not disable the `<style>` with `overflow: hidden` that the popup brings, so this extension supersedes it.

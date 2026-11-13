@@ -1,4 +1,4 @@
-// Ajustes: se guardan al cambiar cada control.
+// Settings: saved as soon as each control changes.
 ;(async () => {
   const { config, calc, icons, render } = UG
   const form = document.getElementById('form')
@@ -12,7 +12,7 @@
 
   document.getElementById('emblem').outerHTML = icons.emblem()
 
-  // Regiones
+  // Regions
   const regionsBox = document.getElementById('regions')
   for (const r of config.REGIONS) {
     const label = document.createElement('label')
@@ -35,7 +35,7 @@
     for (const box of form.querySelectorAll('input[name="regions"]')) box.checked = s.regions.includes(box.value)
   }
 
-  // Valida un campo numérico; devuelve el número o null si no es válido.
+  // Validates a number field; returns the number, or null if it is invalid.
   function readNumber(input) {
     const raw = input.value.trim().replace(/\s/g, '')
     const n = raw === '' ? 0 : Number(raw.replace(',', '.'))
@@ -77,7 +77,7 @@
     input.addEventListener('blur', () => input.value.trim() !== '' && readNumber(input) != null && (input.value = fmt(readNumber(input))))
   }
 
-  // Tasas actuales
+  // Current rates
   const ratesBox = document.getElementById('rates')
   async function loadRates(force) {
     let state = null
