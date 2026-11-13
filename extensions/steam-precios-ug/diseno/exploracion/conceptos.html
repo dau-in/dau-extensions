@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direcciones visuales de Steam Precios UG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Hanken+Grotesk:wght@400..800&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Martian+Mono:wdth,wght@75..112.5,100..800&family=Overpass:wght@400..900&family=Spline+Sans+Mono:wght@400..600&family=Syne:wght@400..800&display=swap">
+<style>
+  /* ================================================================
+     Página de comparación. Cinco direcciones visuales completas sobre
+     el mismo marcado (k-*). Paletas medidas con diseno/conceptos.mjs.
+     ================================================================ */
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0f1115; color: #e8e9ec; font: 15px/1.5 system-ui, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+  .page { display: grid; gap: 72px; max-width: 1240px; margin: 0 auto; padding: 48px 24px 120px; }
+  .intro { display: grid; gap: 10px; max-width: 74ch; }
+  .intro h1 { margin: 0; font-size: 1.75rem; line-height: 1.15; letter-spacing: -0.015em; }
+  .intro p { margin: 0; color: #b4b8c0; text-wrap: pretty; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .toc a { padding: 6px 12px; border-radius: 6px; background: #1c1f26; color: #e8e9ec; text-decoration: none; font-size: 0.8125rem; font-weight: 600; }
+  .toc a:focus-visible { outline: 2px solid #fad120; outline-offset: 2px; }
+
+  .concept { display: grid; gap: 20px; scroll-margin-top: 24px; }
+  .concept__head { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+  .concept__head > div { display: grid; gap: 8px; max-width: 78ch; }
+  .concept h2 { margin: 0; display: flex; align-items: baseline; gap: 12px; font-size: 1.375rem; line-height: 1.2; letter-spacing: -0.01em; }
+  .concept h2 .n { color: #8a8f99; font-weight: 400; font-variant-numeric: tabular-nums; }
+  .concept p { margin: 0; color: #b4b8c0; font-size: 0.875rem; text-wrap: pretty; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 0.8125rem; color: #b4b8c0; }
+  .meta b { color: #e8e9ec; font-weight: 600; }
+  .swatches { display: flex; gap: 6px; }
+  .swatch { width: 28px; height: 28px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12); }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: start; }
+  @media (max-width: 1060px) { .stage { grid-template-columns: minmax(0, 1fr); } .concept__head { grid-template-columns: 1fr; } }
+
+  /* Maqueta de Steam */
+  .steam { display: grid; gap: 18px; padding: 22px; border-radius: 8px; background: #1b2838; color: #c6d4df; font: 13px/1.4 "Motiva Sans", Arial, Helvetica, sans-serif; }
+  .steam-purchase { position: relative; padding: 14px 16px 22px; border-radius: 4px; background: linear-gradient(-60deg, rgba(226,244,255,.3) 5%, rgba(84,107,115,.3) 95%); }
+  .steam-purchase .t { color: #fff; font-size: 19px; }
+  .steam-purchase .act { position: absolute; inset-inline-end: 16px; inset-block-end: -14px; display: flex; align-items: center; padding: 2px; background: #000; border-radius: 2px; }
+  .steam-purchase .act span:first-child { padding: 0 12px; color: #fff; font-size: 14px; }
+  .steam-purchase .act span:last-child { padding: 0 14px; line-height: 28px; border-radius: 2px; color: #d2efa9; font-size: 14px; background: linear-gradient(to right, #75b022 5%, #588a1b 95%); }
+  .steam-rows { display: grid; gap: 3px; }
+  .steam-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) 76px auto; gap: 14px; align-items: center; padding: 4px; background: rgba(0,0,0,.2); }
+  .steam-row img { display: block; width: 92px; height: 35px; object-fit: cover; }
+  .steam-row .title { color: #c7d5e0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .steam-row .price { color: #fff; font-size: 12px; text-align: end; }
+  .steam .k-card { max-width: 616px; }
+  .popup-window { border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 20px 50px -10px rgb(0 0 0 / 0.7); }
+
+  /* ================================================================
+     Base común del marcado k-*. Cada dirección cambia la piel.
+     ================================================================ */
+  .k { font-family: var(--k-font); color: var(--k-text); }
+  .k *, .k *::before, .k *::after { box-sizing: border-box; }
+  .k :where(h3, p, ol, ul, dl, dd) { margin: 0; padding: 0; }
+  .k :where(ol, ul) { list-style: none; }
+  .k button { margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .k :focus-visible { outline: 2px solid var(--k-focus); outline-offset: 2px; }
+  .k :is(.k-amt, .k-value, .k-item__price, .k-rate__v, .k-total__v) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .k-icon { flex: none; width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round; }
+  .k-btn [data-when="on"], .k-btn[aria-pressed="true"] [data-when="off"] { display: none; }
+  .k-btn[aria-pressed="true"] [data-when="on"] { display: block; }
+  .k-serial, .k-spark, .k-delta { display: none; }
+
+  .k-card { container: k-card / inline-size; display: grid; gap: 16px; }
+  .k-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .k-title { display: grid; flex: 1 1 12rem; min-width: 0; }
+  .k-eyebrow { color: var(--k-text2); font-size: 0.75rem; line-height: 1.35; }
+  .k-name { overflow: hidden; font-weight: 700; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+  .k-mark { flex: none; display: inline-grid; place-items: center; font-weight: 800; line-height: 1; }
+  .k-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 0 14px 0 12px; font-size: 0.8125rem; font-weight: 700; white-space: nowrap; }
+  .k-btn--block { width: 100%; min-height: 40px; font-size: 0.875rem; }
+
+  .k-route { display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: 12px 28px; }
+  .k-step { display: grid; align-content: start; gap: 2px; }
+  .k-label { color: var(--k-text2); font-size: 0.75rem; line-height: 1.35; white-space: nowrap; }
+  .k-value { display: inline-flex; align-items: baseline; gap: 0.25em; font-size: 1.125rem; font-weight: 700; line-height: 1.2; }
+  .k-cur { color: var(--k-text2); font-size: 0.72em; font-weight: 600; }
+  .k-route--compact { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .k-route--compact .k-step { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 12px; }
+  @container k-card (max-width: 30rem) {
+    .k-route { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .k-step { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 12px; }
+  }
+
+  .k-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; font-size: 0.8125rem; }
+  .k-link { display: inline-flex; align-items: center; gap: 4px; min-height: 28px; font-weight: 600; }
+  .k-good { display: inline-flex; align-items: center; gap: 6px; color: var(--k-good); }
+
+  .k-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 26px; font-size: 0.8125rem; line-height: 1; white-space: nowrap; }
+  .k-chip__v { display: inline-flex; align-items: baseline; gap: 0.25em; font-weight: 700; }
+  .k-chip__v--sub { color: var(--k-text2); font-weight: 500; }
+
+  .k-popup { display: grid; gap: 14px; width: 340px; padding: 16px; background: var(--k-popup-bg); }
+  .k-phead { display: flex; align-items: center; gap: 10px; }
+  .k-ptitle { flex: 1 1 auto; font-size: 1rem; font-weight: 700; line-height: 1.3; }
+  .k-count { color: var(--k-text2); font-size: 0.75rem; }
+  .k-items { display: grid; gap: 8px; }
+  .k-item { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; }
+  .k-item__text { display: grid; min-width: 0; }
+  .k-item__name { overflow: hidden; font-size: 0.8125rem; font-weight: 600; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+  .k-item__meta { color: var(--k-text2); font-size: 0.75rem; line-height: 1.35; }
+  .k-item__price { font-size: 0.8125rem; font-weight: 700; }
+  .k-icon-btn { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 4px; color: var(--k-text2); }
+  .k-icon-btn--sm { width: 24px; height: 24px; }
+  .k-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .k-total__v { display: inline-flex; align-items: baseline; gap: 0.15em; font-size: 1.75rem; font-weight: 800; line-height: 1.1; }
+  .k-rates { display: grid; gap: 8px; color: var(--k-text2); font-size: 0.75rem; line-height: 1.35; }
+  .k-rate { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; }
+  .k-rate dt { grid-column: 1; }
+  .k-rate__v { grid-column: 2; grid-row: 1; color: var(--k-text); font-weight: 600; text-align: end; }
+  .k-rate__age { grid-column: 1 / -1; }
+
+  /* ================================================================
+     1 · RECIBO
+     Un ticket impreso: papel claro sobre el oscuro de Steam, todo en
+     monoespaciada, borde inferior troquelado, sello azul y el total en
+     bolívares subrayado con marcador y doble raya de contabilidad.
+     ================================================================ */
+  .k-recibo {
+    --paper: oklch(0.935 0.016 88);
+    --ink: oklch(0.24 0.012 80);
+    --ink2: oklch(0.46 0.014 80);
+    --marker: oklch(0.89 0.15 100);
+    --stamp: oklch(0.46 0.17 260);
+    --k-good: oklch(0.46 0.1 155);
+    --k-font: "Martian Mono", ui-monospace, monospace;
+    --k-text: var(--ink);
+    --k-text2: var(--ink2);
+    --k-focus: var(--stamp);
+    --k-popup-bg: var(--paper);
+    font-stretch: 87.5%;
+    font-size: 0.8125rem;
+  }
+  .k-recibo .k-card {
+    gap: 14px;
+    padding: 18px 20px 26px;
+    border-radius: 3px 3px 0 0;
+    background: var(--paper);
+    -webkit-mask: radial-gradient(circle at 7px 100%, #0000 5px, #000 5.5px) 0 0 / 14px 100% repeat-x;
+    mask: radial-gradient(circle at 7px 100%, #0000 5px, #000 5.5px) 0 0 / 14px 100% repeat-x;
+  }
+  .k-recibo .k-mark {
+    width: 38px; height: 38px;
+    border: 2px solid var(--stamp); border-radius: 50%;
+    color: var(--stamp); font-size: 0.8125rem; font-stretch: 112.5%;
+    rotate: -10deg;
+    box-shadow: inset 0 0 0 2px var(--paper), inset 0 0 0 3px var(--stamp);
+  }
+  .k-recibo .k-eyebrow { text-transform: uppercase; letter-spacing: 0.08em; }
+  .k-recibo .k-name { font-size: 0.9375rem; font-weight: 800; font-stretch: 112.5%; }
+  .k-recibo .k-btn { border-radius: 2px; background: var(--stamp); color: var(--paper); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; }
+  .k-recibo .k-btn[aria-pressed="true"] { background: transparent; box-shadow: inset 0 0 0 2px var(--stamp); color: var(--stamp); }
+  .k-recibo .k-route { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .k-recibo .k-step { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 16px; }
+  .k-recibo .k-label { font-size: 0.8125rem; }
+  .k-recibo .k-value { font-size: 0.9375rem; font-weight: 600; }
+  .k-recibo .k-cur { color: var(--ink); font-size: 1em; font-weight: inherit; }
+  .k-recibo .k-step--final { margin-top: 8px; padding: 8px 0 6px; border-top: 1.5px solid var(--ink); border-bottom: 4px double var(--ink); }
+  .k-recibo .k-step--final .k-label { color: var(--ink); font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+  .k-recibo .k-step--final .k-value { padding: 0 4px; font-size: 1.25rem; font-weight: 800; font-stretch: 100%; background: linear-gradient(transparent 18%, var(--marker) 18% 88%, transparent 88%); }
+  .k-recibo .k-link { color: var(--stamp); text-decoration: underline; text-underline-offset: 3px; }
+  .k-recibo .k-chip {
+    gap: 7px; padding: 0 10px; min-height: 26px;
+    background: var(--paper); color: var(--ink); font-family: var(--k-font); font-stretch: 87.5%;
+    -webkit-mask: radial-gradient(circle 4px at 0 50%, #0000 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 4px at 100% 50%, #0000 98%, #000) right / 51% 100% no-repeat;
+    mask: radial-gradient(circle 4px at 0 50%, #0000 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 4px at 100% 50%, #0000 98%, #000) right / 51% 100% no-repeat;
+  }
+  .k-recibo .k-chip .k-mark { width: auto; height: auto; border: 0; rotate: none; box-shadow: none; font-size: 0.75rem; }
+  .k-recibo .k-chip__v--sub { color: var(--ink2); }
+  .popup-window:has(.k-recibo) { background: #1a1d22; padding: 12px; }
+  .k-recibo.k-popup { padding: 18px 18px 28px; -webkit-mask: radial-gradient(circle at 7px 100%, #0000 5px, #000 5.5px) 0 0 / 14px 100% repeat-x; mask: radial-gradient(circle at 7px 100%, #0000 5px, #000 5.5px) 0 0 / 14px 100% repeat-x; }
+  .k-recibo .k-phead { padding-bottom: 10px; border-bottom: 1.5px solid var(--ink); }
+  .k-recibo .k-ptitle { font-weight: 800; font-stretch: 112.5%; text-transform: uppercase; letter-spacing: 0.04em; }
+  .k-recibo .k-phead .k-mark { width: 32px; height: 32px; font-size: 0.6875rem; }
+  .k-recibo .k-total { padding-top: 8px; border-top: 1.5px solid var(--ink); }
+  .k-recibo .k-total .k-label { color: var(--ink); font-weight: 800; text-transform: uppercase; }
+  .k-recibo .k-total__v { font-size: 1.5rem; font-stretch: 112.5%; }
+  .k-recibo .k-rates { padding-top: 10px; border-top: 1.5px solid var(--ink); }
+
+  /* ================================================================
+     2 · RUTA
+     La conversión es un viaje: ₴ → HK$ → USDT → Bs como estaciones de
+     una línea de metro. Señalética: Overpass, marca como insignia de
+     línea, terminal amarilla.
+     ================================================================ */
+  .k-ruta {
+    --bg: oklch(0.2 0.008 60);
+    --surface: oklch(0.235 0.009 60);
+    --raise: oklch(0.29 0.01 60);
+    --blue: oklch(0.62 0.17 257);
+    --yellow: oklch(0.87 0.17 95);
+    --k-good: oklch(0.8 0.13 155);
+    --k-font: "Overpass", system-ui, sans-serif;
+    --k-text: oklch(0.96 0.004 60);
+    --k-text2: oklch(0.8 0.008 60);
+    --k-focus: var(--yellow);
+    --k-popup-bg: var(--bg);
+  }
+  .k-ruta .k-card { gap: 20px; padding: 18px 22px 16px; border-radius: 14px; background: var(--surface); box-shadow: 0 0 0 1px oklch(1 0 0 / 0.08); }
+  .k-ruta .k-mark { width: 34px; height: 34px; border-radius: 50%; background: var(--yellow); color: var(--bg); font-size: 0.8125rem; font-weight: 900; letter-spacing: -0.02em; }
+  .k-ruta .k-name { font-size: 1.0625rem; font-weight: 800; }
+  .k-ruta .k-btn { border-radius: 999px; background: var(--yellow); color: var(--bg); font-weight: 800; }
+  .k-ruta .k-btn[aria-pressed="true"] { background: var(--raise); color: var(--yellow); box-shadow: inset 0 0 0 2px var(--yellow); }
+  .k-ruta .k-route { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+  .k-ruta .k-step { position: relative; gap: 4px; padding-top: 28px; padding-right: 12px; }
+  .k-ruta .k-step::before { content: ""; position: absolute; top: 0; left: 0; z-index: 1; width: 18px; height: 18px; border: 4px solid var(--blue); border-radius: 50%; background: var(--surface); }
+  .k-ruta .k-step:not(:last-child)::after { content: ""; position: absolute; top: 7px; left: 9px; right: 0; height: 4px; background: var(--blue); }
+  .k-ruta .k-step--final::before { top: -3px; left: -3px; width: 24px; height: 24px; border-color: var(--yellow); background: var(--yellow); box-shadow: 0 0 0 4px var(--surface), 0 0 0 6px var(--yellow); }
+  .k-ruta .k-label { font-weight: 700; }
+  .k-ruta .k-value { font-size: 1.0625rem; font-weight: 800; }
+  .k-ruta .k-step--final .k-value { color: var(--yellow); font-size: 1.25rem; }
+  .k-ruta .k-step--final .k-cur { color: var(--yellow); }
+  .k-ruta .k-foot { padding-top: 12px; border-top: 1px solid oklch(1 0 0 / 0.08); }
+  .k-ruta .k-link { color: var(--k-text); }
+  .k-ruta .k-good { padding: 4px 10px 4px 8px; border-radius: 6px; background: oklch(0.8 0.13 155 / 0.12); font-weight: 600; }
+  @container k-card (max-width: 30rem) {
+    .k-ruta .k-route { grid-template-columns: minmax(0, 1fr); }
+  }
+  .k-ruta .k-chip { gap: 8px; padding: 0 12px 0 3px; min-height: 26px; border-radius: 999px; background: var(--surface); box-shadow: 0 0 0 1px oklch(1 0 0 / 0.1); font-family: var(--k-font); }
+  .k-ruta .k-chip .k-mark { width: 20px; height: 20px; font-size: 0.5625rem; }
+  .k-ruta .k-chip__v { font-weight: 800; }
+  /* En el popup la línea va en vertical. */
+  .k-ruta .k-route--compact { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 4px 0 0 2px; }
+  .k-ruta .k-route--compact .k-step { grid-template-columns: minmax(0, 1fr) auto; padding: 0 0 14px 30px; }
+  .k-ruta .k-route--compact .k-step::before { top: 1px; left: 0; width: 16px; height: 16px; }
+  .k-ruta .k-route--compact .k-step:not(:last-child)::after { top: 9px; bottom: -1px; left: 6px; right: auto; width: 4px; height: auto; }
+  .k-ruta .k-route--compact .k-step--final { padding-bottom: 0; }
+  .k-ruta .k-route--compact .k-step--final::before { top: -2px; left: -3px; width: 22px; height: 22px; }
+  .k-ruta .k-route--compact .k-value { font-size: 1rem; }
+  .k-ruta .k-route--compact .k-step--final .k-value { font-size: 1.25rem; }
+  .k-ruta .k-ptitle { font-weight: 800; font-size: 1.0625rem; }
+  .k-ruta .k-phead .k-mark { width: 30px; height: 30px; font-size: 0.75rem; }
+  .k-ruta .k-count { padding: 2px 8px; border-radius: 999px; background: var(--raise); color: var(--k-text); font-weight: 700; }
+  .k-ruta .k-items, .k-ruta .k-totalbox { padding: 12px 14px; border-radius: 12px; background: var(--surface); }
+  .k-ruta .k-total__v { font-weight: 900; }
+  .k-ruta .k-rate__age { justify-self: start; }
+
+  /* ================================================================
+     3 · BILLETE
+     Papel moneda: tinta violeta con guilloche, marco doble dorado,
+     cifras grabadas en Fraunces y número de serie en rojo (el id del
+     juego en Steam).
+     ================================================================ */
+  .k-billete {
+    --ink-bg: oklch(0.25 0.045 300);
+    --gold: oklch(0.83 0.12 82);
+    --serial: oklch(0.72 0.16 28);
+    --k-good: oklch(0.84 0.11 160);
+    --k-font: "Hanken Grotesk", system-ui, sans-serif;
+    --k-text: oklch(0.95 0.02 90);
+    --k-text2: oklch(0.82 0.03 300);
+    --k-focus: var(--gold);
+    --k-popup-bg: var(--ink-bg);
+    --guilloche: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='28'%3E%3Cg fill='none' stroke='%23c9b8f0' stroke-opacity='.16' stroke-width='.8'%3E%3Cpath d='M0 14C20 0 60 0 80 14S140 28 160 14'/%3E%3Cpath d='M0 14C20 28 60 28 80 14S140 0 160 14'/%3E%3Cpath d='M0 4C20 -6 60 -6 80 4S140 14 160 4'/%3E%3Cpath d='M0 24C20 34 60 34 80 24S140 14 160 24'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .k-billete .k-card, .k-billete.k-popup {
+    background: var(--guilloche) 0 0 / 160px 28px, radial-gradient(120% 140% at 85% 20%, oklch(0.31 0.06 300), transparent 60%), var(--ink-bg);
+    outline: 1px solid oklch(0.83 0.12 82 / 0.45);
+    outline-offset: -7px;
+    box-shadow: 0 0 0 1px oklch(0.83 0.12 82 / 0.7);
+  }
+  .k-billete .k-card { gap: 18px; padding: 22px 26px 20px; border-radius: 6px; }
+  .k-billete .k-mark { width: 40px; height: 40px; border-radius: 50%; color: var(--gold); font-family: "Fraunces", serif; font-style: italic; font-size: 1rem; font-weight: 700; font-variation-settings: "SOFT" 100; box-shadow: inset 0 0 0 1.5px var(--gold), inset 0 0 0 4px var(--ink-bg), inset 0 0 0 5px oklch(0.83 0.12 82 / 0.5); }
+  .k-billete .k-eyebrow { text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.75rem; font-weight: 600; }
+  .k-billete .k-name { font-family: "Fraunces", serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+  .k-billete .k-serial { display: block; color: var(--serial); font-family: "Spline Sans Mono", monospace; font-size: 0.75rem; letter-spacing: 0.08em; }
+  .k-billete .k-btn { border-radius: 4px; background: linear-gradient(in oklab 160deg, oklch(0.9 0.1 88), var(--gold) 55%, oklch(0.76 0.12 75)); color: var(--ink-bg); font-weight: 800; }
+  .k-billete .k-btn[aria-pressed="true"] { background: transparent; box-shadow: inset 0 0 0 1.5px var(--gold); color: var(--gold); }
+  .k-billete .k-route { gap: 12px 24px; }
+  .k-billete .k-label { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.75rem; font-weight: 600; }
+  .k-billete .k-value { font-family: "Fraunces", serif; font-size: 1.375rem; font-weight: 600; letter-spacing: -0.01em; }
+  .k-billete .k-cur { font-family: "Hanken Grotesk", sans-serif; font-size: 0.55em; font-weight: 700; letter-spacing: 0.04em; }
+  .k-billete .k-step--final .k-value { color: var(--gold); font-size: 1.625rem; }
+  .k-billete .k-step--final .k-cur { color: var(--gold); }
+  .k-billete .k-link { color: var(--gold); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .k-billete .k-chip { gap: 8px; padding: 0 10px 0 4px; min-height: 26px; border-radius: 4px; background: var(--ink-bg); box-shadow: 0 0 0 1px oklch(0.83 0.12 82 / 0.7); font-family: var(--k-font); }
+  .k-billete .k-chip .k-mark { width: 20px; height: 20px; font-size: 0.6875rem; box-shadow: inset 0 0 0 1px var(--gold); }
+  .k-billete .k-chip__v { font-family: "Fraunces", serif; font-size: 0.9375rem; font-weight: 600; }
+  .k-billete .k-chip__v .k-cur { color: var(--k-text2); }
+  .k-billete.k-popup { padding: 22px; }
+  .k-billete .k-ptitle { font-family: "Fraunces", serif; font-size: 1.25rem; font-weight: 600; }
+  .k-billete .k-phead .k-mark { width: 34px; height: 34px; font-size: 0.875rem; }
+  .k-billete .k-item__price, .k-billete .k-rate__v { font-family: "Fraunces", serif; font-size: 0.9375rem; font-weight: 600; }
+  .k-billete .k-total .k-label { font-size: 0.75rem; }
+  .k-billete .k-total__v { color: var(--gold); font-family: "Fraunces", serif; font-size: 2.25rem; font-weight: 600; letter-spacing: -0.02em; }
+  .k-billete .k-route--compact .k-value { font-size: 1.125rem; }
+  .k-billete .k-route--compact .k-step--final .k-value { font-size: 1.375rem; }
+  .k-billete .k-rate__age { font-family: "Spline Sans Mono", monospace; }
+
+  /* ================================================================
+     4 · TERMINAL
+     Pantalla de exchange: negro puro, retícula de 1 px, esquinas de
+     visor amarillas, todo en IBM Plex y la celda final invertida.
+     ================================================================ */
+  .k-terminal {
+    --bg: oklch(0.15 0 0);
+    --surface: oklch(0.18 0 0);
+    --grid: oklch(0.34 0 0);
+    --signal: oklch(0.88 0.17 95);
+    --k-good: oklch(0.8 0.16 150);
+    --k-font: "IBM Plex Sans Condensed", system-ui, sans-serif;
+    --k-mono: "IBM Plex Mono", ui-monospace, monospace;
+    --k-text: oklch(0.96 0 0);
+    --k-text2: oklch(0.78 0 0);
+    --k-focus: var(--signal);
+    --k-popup-bg: var(--bg);
+  }
+  .k-terminal .k-card {
+    gap: 14px; padding: 16px 18px;
+    background:
+      linear-gradient(var(--signal), var(--signal)) top left / 12px 2px,
+      linear-gradient(var(--signal), var(--signal)) top left / 2px 12px,
+      linear-gradient(var(--signal), var(--signal)) top right / 12px 2px,
+      linear-gradient(var(--signal), var(--signal)) top right / 2px 12px,
+      linear-gradient(var(--signal), var(--signal)) bottom left / 12px 2px,
+      linear-gradient(var(--signal), var(--signal)) bottom left / 2px 12px,
+      linear-gradient(var(--signal), var(--signal)) bottom right / 12px 2px,
+      linear-gradient(var(--signal), var(--signal)) bottom right / 2px 12px,
+      var(--surface);
+    background-repeat: no-repeat;
+    box-shadow: 0 0 0 1px var(--grid);
+  }
+  .k-terminal .k-mark { width: 36px; height: 36px; background: var(--signal); color: var(--bg); font-family: var(--k-mono); font-size: 0.875rem; font-weight: 700; }
+  .k-terminal :is(.k-eyebrow, .k-label, .k-count, .k-rates, .k-good, .k-link) { font-family: var(--k-mono); }
+  .k-terminal .k-eyebrow, .k-terminal .k-label { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.75rem; }
+  .k-terminal .k-name { font-size: 1.125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.01em; }
+  .k-terminal .k-btn { border-radius: 0; background: var(--signal); color: var(--bg); font-family: var(--k-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .k-terminal .k-btn[aria-pressed="true"] { background: transparent; box-shadow: inset 0 0 0 1px var(--signal); color: var(--signal); }
+  .k-terminal .k-route { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--grid); box-shadow: 0 0 0 1px var(--grid); }
+  .k-terminal .k-step { gap: 6px; padding: 10px 12px; background: var(--bg); }
+  .k-terminal .k-value { font-family: var(--k-mono); font-size: 1rem; font-weight: 600; letter-spacing: -0.02em; }
+  .k-terminal .k-cur { font-weight: 500; }
+  .k-terminal .k-step--final { background: var(--signal); }
+  .k-terminal .k-step--final :is(.k-label, .k-value, .k-cur) { color: var(--bg); }
+  .k-terminal .k-step--final .k-value { font-weight: 700; }
+  @container k-card (max-width: 30rem) { .k-terminal .k-route { grid-template-columns: minmax(0, 1fr); } }
+  .k-terminal .k-link { color: var(--k-text); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .k-terminal .k-good { font-size: 0.75rem; }
+  .k-terminal .k-chip { gap: 0; min-height: 24px; background: var(--bg); box-shadow: 0 0 0 1px var(--grid); font-family: var(--k-mono); font-size: 0.75rem; }
+  .k-terminal .k-chip > * { display: inline-flex; align-items: center; align-self: stretch; padding: 0 8px; }
+  .k-terminal .k-chip .k-mark { width: auto; height: auto; font-size: 0.6875rem; }
+  .k-terminal .k-chip__v--sub { border-left: 1px solid var(--grid); }
+  .k-terminal .k-ptitle { font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
+  .k-terminal .k-phead .k-mark { width: 30px; height: 30px; font-size: 0.75rem; }
+  .k-terminal .k-items { gap: 0; box-shadow: 0 0 0 1px var(--grid); }
+  .k-terminal .k-item { padding: 8px 6px 8px 10px; }
+  .k-terminal .k-item + .k-item { border-top: 1px solid var(--grid); }
+  .k-terminal .k-item__price { font-family: var(--k-mono); font-weight: 600; }
+  .k-terminal .k-total .k-label { font-size: 0.75rem; }
+  .k-terminal .k-total__v { font-family: var(--k-mono); font-weight: 700; letter-spacing: -0.04em; }
+  .k-terminal .k-route--compact { grid-template-columns: minmax(0, 1fr); }
+  .k-terminal .k-route--compact .k-step { padding: 8px 10px; }
+  .k-terminal .k-btn--block { font-size: 0.8125rem; }
+  .k-terminal .k-rate { grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; }
+  .k-terminal .k-rate__v { grid-column: 3; }
+  .k-terminal .k-spark { display: block; grid-column: 2; grid-row: 1; width: 56px; height: 16px; color: var(--k-good); }
+  .k-terminal .k-delta { display: block; grid-column: 2 / -1; grid-row: 2; justify-self: end; color: var(--k-good); }
+  .k-terminal .k-rate__age { grid-column: 1; grid-row: 2; }
+
+  /* ================================================================
+     5 · STICKER
+     Pegatinas de grupo: crema con bordes de tinta de 2 px, sombra dura
+     amarilla, Syne en negrita y la cifra final ladeada como un sticker.
+     ================================================================ */
+  .k-sticker {
+    --card: oklch(0.96 0.03 95);
+    --ink: oklch(0.2 0.02 265);
+    --ink2: oklch(0.42 0.02 265);
+    --yellow: oklch(0.88 0.17 95);
+    --blue: oklch(0.5 0.2 262);
+    --k-good: oklch(0.45 0.1 155);
+    --k-font: "Instrument Sans", system-ui, sans-serif;
+    --k-display: "Syne", system-ui, sans-serif;
+    --k-text: var(--ink);
+    --k-text2: var(--ink2);
+    --k-focus: var(--blue);
+    --k-popup-bg: var(--card);
+  }
+  .k-sticker .k-card { gap: 16px; padding: 18px 20px; border: 2px solid var(--ink); border-radius: 18px; background: var(--card); box-shadow: 6px 6px 0 var(--yellow); }
+  .k-sticker .k-mark { width: 42px; height: 42px; border: 2px solid var(--ink); border-radius: 50%; background: var(--blue); color: var(--card); font-family: var(--k-display); font-size: 0.9375rem; rotate: -12deg; }
+  .k-sticker .k-name { font-family: var(--k-display); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em; }
+  .k-sticker .k-eyebrow { font-weight: 600; }
+  .k-sticker .k-btn { border: 2px solid var(--ink); border-radius: 999px; background: var(--yellow); color: var(--ink); box-shadow: 3px 3px 0 var(--ink); font-weight: 800; }
+  .k-sticker .k-btn[aria-pressed="true"] { background: var(--card); box-shadow: 1px 1px 0 var(--ink); translate: 2px 2px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .k-sticker .k-btn { transition: translate 120ms ease-out, box-shadow 120ms ease-out; }
+    .k-sticker .k-btn:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--ink); }
+  }
+  .k-sticker .k-route { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .k-sticker .k-step { gap: 4px; padding: 10px 14px 12px; border: 2px solid var(--ink); border-radius: 14px; background: oklch(1 0 0); }
+  .k-sticker .k-label { font-weight: 600; }
+  .k-sticker .k-value { font-family: var(--k-display); font-size: 1.1875rem; font-weight: 800; }
+  .k-sticker .k-cur { color: var(--ink2); font-family: var(--k-font); font-weight: 700; }
+  .k-sticker .k-step--final { background: var(--yellow); rotate: 2deg; box-shadow: 3px 3px 0 var(--ink); }
+  .k-sticker .k-step--final .k-label { color: var(--ink); }
+  .k-sticker .k-step--final .k-cur { color: var(--ink); }
+  .k-sticker .k-step--final .k-value { font-size: 1.375rem; }
+  @container k-card (max-width: 30rem) { .k-sticker .k-route { grid-template-columns: minmax(0, 1fr); } .k-sticker .k-step--final { rotate: 0deg; } }
+  .k-sticker .k-link { color: var(--blue); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; font-weight: 700; }
+  .k-sticker .k-good { font-weight: 700; }
+  .k-sticker .k-chip { gap: 7px; padding: 0 12px 0 2px; min-height: 28px; border: 2px solid var(--ink); border-radius: 999px; background: var(--card); color: var(--ink); box-shadow: 2px 2px 0 var(--yellow); font-family: var(--k-font); }
+  .k-sticker .k-chip .k-mark { width: 22px; height: 22px; border-width: 1.5px; font-size: 0.5625rem; rotate: -12deg; }
+  .k-sticker .k-chip__v { font-family: var(--k-display); font-weight: 800; }
+  .k-sticker .k-chip__v .k-cur { font-family: var(--k-font); }
+  .popup-window:has(.k-sticker) { background: #1a1d22; padding: 12px 18px 18px 12px; }
+  .k-sticker.k-popup { border: 2px solid var(--ink); border-radius: 20px; box-shadow: 6px 6px 0 var(--yellow); }
+  .k-sticker .k-ptitle { font-family: var(--k-display); font-size: 1.25rem; font-weight: 800; }
+  .k-sticker .k-phead .k-mark { width: 36px; height: 36px; font-size: 0.8125rem; }
+  .k-sticker .k-count { padding: 2px 8px; border: 2px solid var(--ink); border-radius: 999px; background: var(--yellow); color: var(--ink); font-weight: 800; }
+  .k-sticker .k-item { padding: 8px 6px 8px 12px; border: 2px solid var(--ink); border-radius: 12px; background: oklch(1 0 0); }
+  .k-sticker .k-item__price { font-family: var(--k-display); font-weight: 800; }
+  .k-sticker .k-total__v { font-family: var(--k-display); font-size: 2rem; letter-spacing: -0.02em; }
+  .k-sticker .k-route--compact { gap: 8px; }
+  .k-sticker .k-route--compact .k-step { padding: 8px 12px; }
+  .k-sticker .k-route--compact .k-step--final { rotate: -1.5deg; }
+  .k-sticker .k-btn--block { min-height: 42px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect vector-effect="non-scaling-stroke" x="9" y="9" width="12" height="12" rx="2"/><path vector-effect="non-scaling-stroke" d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M20 7h-9M14 17H4M17 4v6M7 14v6M4 7h5M20 17h-3"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle vector-effect="non-scaling-stroke" cx="12" cy="12" r="9"/><path vector-effect="non-scaling-stroke" d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  </defs>
+</svg>
+
+<main class="page">
+  <header class="intro">
+    <h1>Direcciones visuales</h1>
+    <p>Cinco lenguajes distintos para toda la interfaz: paleta, tipografía, formas y detalles propios. El marcado y los datos son iguales en todas; solo cambia la piel. Ninguna usa separadores de texto como «·» o «|»: la estructura sale del espacio, de la retícula o de la forma. Todas las paletas pasan WCAG AA (medidas con <code>node diseno/conceptos.mjs</code>).</p>
+    <nav class="toc" aria-label="Direcciones">
+      <a href="#recibo">1 Recibo</a><a href="#ruta">2 Ruta</a><a href="#billete">3 Billete</a><a href="#terminal">4 Terminal</a><a href="#sticker">5 Sticker</a>
+    </nav>
+  </header>
+
+  <section class="concept" id="recibo">
+    <div class="concept__head">
+      <div>
+        <h2><span class="n">1</span> Recibo</h2>
+        <p>Cada precio es un ticket impreso de lo que vas a pagar. Es papel claro sobre la tienda oscura, así que es imposible confundirlo con Steam. El borde es troquelado y la marca «UG» es un sello de tinta. El total en bolívares lleva marcador amarillo y la doble raya con la que se cierra una cuenta.</p>
+        <div class="meta"><span><b>Martian Mono</b> en todo, a tres anchuras</span></div>
+      </div>
+      <div class="swatches" aria-hidden="true"><span class="swatch" style="background:oklch(0.935 0.016 88)"></span><span class="swatch" style="background:oklch(0.24 0.012 80)"></span><span class="swatch" style="background:oklch(0.46 0.17 260)"></span><span class="swatch" style="background:oklch(0.89 0.15 100)"></span></div>
+    </div>
+    <div class="stage" data-concept="k-recibo"></div>
+  </section>
+
+  <section class="concept" id="ruta">
+    <div class="concept__head">
+      <div>
+        <h2><span class="n">2</span> Ruta</h2>
+        <p>La compra es un viaje de cuatro estaciones, ₴, HK$, USDT y Bs, dibujado como una línea de metro. Cuenta el proceso real del grupo sin palabras. La terminal amarilla es lo que pagas. Usa letra de señalética y la marca es la insignia de la línea.</p>
+        <div class="meta"><span><b>Overpass</b> en todo, inspirada en la señalización vial</span></div>
+      </div>
+      <div class="swatches" aria-hidden="true"><span class="swatch" style="background:oklch(0.235 0.009 60)"></span><span class="swatch" style="background:oklch(0.62 0.17 257)"></span><span class="swatch" style="background:oklch(0.87 0.17 95)"></span><span class="swatch" style="background:oklch(0.96 0.004 60)"></span></div>
+    </div>
+    <div class="stage" data-concept="k-ruta"></div>
+  </section>
+
+  <section class="concept" id="billete">
+    <div class="concept__head">
+      <div>
+        <h2><span class="n">3</span> Billete</h2>
+        <p>Estética de papel moneda: tinta violeta con guilloche, marco doble dorado y cifras grabadas en serifa. Como número de serie en rojo va el id del juego en Steam. Es la más elegante y la más «de dinero».</p>
+        <div class="meta"><span><b>Fraunces</b> en las cifras</span><span><b>Hanken Grotesk</b> en la interfaz</span><span><b>Spline Sans Mono</b> en el número de serie</span></div>
+      </div>
+      <div class="swatches" aria-hidden="true"><span class="swatch" style="background:oklch(0.25 0.045 300)"></span><span class="swatch" style="background:oklch(0.83 0.12 82)"></span><span class="swatch" style="background:oklch(0.72 0.16 28)"></span><span class="swatch" style="background:oklch(0.95 0.02 90)"></span></div>
+    </div>
+    <div class="stage" data-concept="k-billete"></div>
+  </section>
+
+  <section class="concept" id="terminal">
+    <div class="concept__head">
+      <div>
+        <h2><span class="n">4</span> Terminal</h2>
+        <p>Versión mejorada de la que te gustó: pantalla de exchange en negro puro, con retícula de 1 px y esquinas de visor amarillas. La celda final va invertida. En el popup, la tasa P2P trae una minigráfica y su variación del día, con datos que la extensión iría guardando en cada consulta.</p>
+        <div class="meta"><span><b>IBM Plex Mono</b> en cifras y etiquetas</span><span><b>IBM Plex Sans Condensed</b> en la interfaz</span></div>
+      </div>
+      <div class="swatches" aria-hidden="true"><span class="swatch" style="background:oklch(0.15 0 0)"></span><span class="swatch" style="background:oklch(0.34 0 0)"></span><span class="swatch" style="background:oklch(0.88 0.17 95)"></span><span class="swatch" style="background:oklch(0.8 0.16 150)"></span></div>
+    </div>
+    <div class="stage" data-concept="k-terminal"></div>
+  </section>
+
+  <section class="concept" id="sticker">
+    <div class="concept__head">
+      <div>
+        <h2><span class="n">5</span> Sticker</h2>
+        <p>Estilo pegatina de grupo de amigos: crema con bordes de tinta, sombra dura amarilla y botones que se hunden al pulsarlos. La cifra final va ladeada como un sticker pegado. Es la más divertida y la que más tiene de «gang».</p>
+        <div class="meta"><span><b>Syne</b> en títulos y cifras</span><span><b>Instrument Sans</b> en la interfaz</span></div>
+      </div>
+      <div class="swatches" aria-hidden="true"><span class="swatch" style="background:oklch(0.96 0.03 95)"></span><span class="swatch" style="background:oklch(0.2 0.02 265)"></span><span class="swatch" style="background:oklch(0.88 0.17 95)"></span><span class="swatch" style="background:oklch(0.5 0.2 262)"></span></div>
+    </div>
+    <div class="stage" data-concept="k-sticker"></div>
+  </section>
+</main>
+
+<template id="t-stage">
+  <div class="steam">
+    <div class="steam-purchase">
+      <div class="t">Comprar ELDEN RING</div>
+      <div class="act"><span>1&nbsp;799₴</span><span>Añadir al carro</span></div>
+    </div>
+    <article class="k k-card" data-k aria-label="Precio UG de ELDEN RING" style="margin-top:14px">
+      <header class="k-head">
+        <span class="k-mark" aria-hidden="true">UG</span>
+        <div class="k-title">
+          <span class="k-eyebrow">Steam Ucrania</span>
+          <span class="k-name">ELDEN RING</span>
+        </div>
+        <span class="k-serial" aria-hidden="true">Nº 1245620</span>
+        <button class="k-btn" type="button" aria-pressed="false" aria-label="Lista UG: ELDEN RING" data-toggle>
+          <svg class="k-icon" data-when="off" aria-hidden="true"><use href="#i-plus"/></svg>
+          <svg class="k-icon" data-when="on" aria-hidden="true"><use href="#i-check"/></svg>
+          Lista UG
+        </button>
+      </header>
+      <ol class="k-route" aria-label="De grivnas a bolívares">
+        <li class="k-step"><span class="k-label">Precio en Steam</span><span class="k-value"><span class="k-amt">1&nbsp;799</span><span class="k-cur">₴</span></span></li>
+        <li class="k-step"><span class="k-label">Tarjeta Hong Kong</span><span class="k-value"><span class="k-cur">HK$</span><span class="k-amt">336.45</span></span></li>
+        <li class="k-step"><span class="k-label">En Binance</span><span class="k-value"><span class="k-amt">44,54</span><span class="k-cur">USDT</span></span></li>
+        <li class="k-step k-step--final"><span class="k-label">Pagas en bolívares</span><span class="k-value"><span class="k-cur">Bs</span><span class="k-amt">48.016,87</span></span></li>
+      </ol>
+      <footer class="k-foot">
+        <button class="k-link" type="button" aria-expanded="false"><svg class="k-icon" aria-hidden="true"><use href="#i-chevron"/></svg>Comparar regiones</button>
+        <span class="k-good"><svg class="k-icon" aria-hidden="true"><use href="#i-check-circle"/></svg>La más barata de 9 regiones</span>
+      </footer>
+    </article>
+    <div class="steam-rows">
+      <div class="steam-row">
+        <img src="https://cdn.akamai.steamstatic.com/steam/apps/620/capsule_sm_120.jpg" alt="">
+        <div class="title">Portal 2</div>
+        <div class="price">240,00₴</div>
+        <span class="k k-chip" data-k><span class="k-mark" aria-hidden="true">UG</span><span class="k-chip__v"><span class="k-cur">Bs</span><span class="k-amt">6.406</span></span><span class="k-chip__v k-chip__v--sub"><span class="k-cur">HK$</span><span class="k-amt">44.88</span></span></span>
+      </div>
+      <div class="steam-row">
+        <img src="https://cdn.akamai.steamstatic.com/steam/apps/367520/capsule_sm_120.jpg" alt="">
+        <div class="title">Hollow Knight</div>
+        <div class="price">169,00₴</div>
+        <span class="k k-chip" data-k><span class="k-mark" aria-hidden="true">UG</span><span class="k-chip__v"><span class="k-cur">Bs</span><span class="k-amt">4.511</span></span><span class="k-chip__v k-chip__v--sub"><span class="k-cur">HK$</span><span class="k-amt">31.61</span></span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup-window">
+    <div class="k k-popup" data-k>
+      <header class="k-phead">
+        <span class="k-mark" aria-hidden="true">UG</span>
+        <h3 class="k-ptitle">Lista UG</h3>
+        <span class="k-count">2 juegos</span>
+        <button class="k-icon-btn" type="button" aria-label="Abrir los ajustes"><svg class="k-icon" aria-hidden="true"><use href="#i-sliders"/></svg></button>
+      </header>
+      <ul class="k-items">
+        <li class="k-item">
+          <span class="k-item__text"><span class="k-item__name">ELDEN RING</span><span class="k-item__meta">Edición estándar</span></span>
+          <span class="k-item__price">1&nbsp;799₴</span>
+          <button class="k-icon-btn k-icon-btn--sm" type="button" aria-label="Quitar ELDEN RING de la lista"><svg class="k-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+        </li>
+        <li class="k-item">
+          <span class="k-item__text"><span class="k-item__name">Portal 2</span><span class="k-item__meta">Juego base</span></span>
+          <span class="k-item__price">240₴</span>
+          <button class="k-icon-btn k-icon-btn--sm" type="button" aria-label="Quitar Portal 2 de la lista"><svg class="k-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+        </li>
+      </ul>
+      <div class="k-totalbox" style="display:grid;gap:12px">
+        <div class="k-total"><span class="k-label">Total</span><span class="k-total__v"><span class="k-amt">2&nbsp;039</span><span class="k-cur">₴</span></span></div>
+        <ol class="k-route k-route--compact" aria-label="El total, de grivnas a bolívares">
+          <li class="k-step"><span class="k-label">Tarjeta Hong Kong</span><span class="k-value"><span class="k-cur">HK$</span><span class="k-amt">381.33</span></span></li>
+          <li class="k-step"><span class="k-label">En Binance</span><span class="k-value"><span class="k-amt">50,48</span><span class="k-cur">USDT</span></span></li>
+          <li class="k-step k-step--final"><span class="k-label">Pagas en bolívares</span><span class="k-value"><span class="k-cur">Bs</span><span class="k-amt">54.422,67</span></span></li>
+        </ol>
+      </div>
+      <button class="k-btn k-btn--block" type="button"><svg class="k-icon" aria-hidden="true"><use href="#i-copy"/></svg>Copiar resumen</button>
+      <dl class="k-rates">
+        <div class="k-rate">
+          <dt>USDT en Binance P2P</dt>
+          <dd class="k-rate__v">Bs&nbsp;1.078,00</dd>
+          <dd class="k-spark" aria-hidden="true"><svg viewBox="0 0 56 16" width="56" height="16"><polyline fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" points="0,12 7,11 14,13 21,9 28,10 35,7 42,8 49,4 56,5"/></svg></dd>
+          <dd class="k-delta">+0,8&nbsp;% en 24&nbsp;h</dd>
+          <dd class="k-rate__age">Actualizada hace 3&nbsp;min</dd>
+        </div>
+        <div class="k-rate">
+          <dt>HK$ a precio de mercado</dt>
+          <dd class="k-rate__v">5,35₴</dd>
+          <dd class="k-rate__age">Actualizada hace 2&nbsp;h</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</template>
+
+<script>
+  const tpl = document.getElementById('t-stage')
+  for (const stage of document.querySelectorAll('[data-concept]')) {
+    stage.append(tpl.content.cloneNode(true))
+    for (const el of stage.querySelectorAll('[data-k]')) el.classList.add(stage.dataset.concept)
+  }
+  for (const btn of document.querySelectorAll('[data-toggle]')) {
+    btn.addEventListener('click', () => btn.setAttribute('aria-pressed', String(btn.getAttribute('aria-pressed') !== 'true')))
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam Precios UG · Sistema de diseño</title>
+<link rel="stylesheet" href="ui/tokens.css">
+<link rel="stylesheet" href="ui/componentes.css">
+<style>
+  /* Estilos solo de esta página de muestra. Los colores literales de Steam
+     imitan la tienda para ver las piezas en su sitio. */
+  body {
+    margin: 0;
+    background: var(--ug-color-bg-page);
+  }
+  .m-wrap {
+    display: grid;
+    gap: 56px;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 40px 24px 96px;
+  }
+  .m-intro { display: grid; gap: 8px; max-width: 70ch; }
+  .m-intro h1 {
+    display: flex; align-items: center; gap: 10px;
+    font-size: var(--ug-text-title); line-height: var(--ug-leading-title);
+    letter-spacing: var(--ug-tracking-title); font-weight: var(--ug-weight-strong);
+  }
+  .m-intro p, .m-lead { color: var(--ug-color-text-secondary); text-wrap: pretty; max-width: 70ch; }
+  .m-toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  .m-section { display: grid; gap: 20px; scroll-margin-block-start: 24px; }
+  .m-section > h2 {
+    font-size: var(--ug-text-title); line-height: var(--ug-leading-title);
+    letter-spacing: var(--ug-tracking-title); font-weight: var(--ug-weight-strong);
+  }
+  .m-sub { display: grid; gap: 12px; }
+  .m-sub > h3 { font-size: var(--ug-text-heading); line-height: var(--ug-leading-heading); font-weight: var(--ug-weight-strong); }
+  .m-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); align-items: start; }
+  .m-caption { color: var(--ug-color-text-secondary); font-size: var(--ug-text-caption); line-height: var(--ug-leading-caption); }
+  .m-state { display: grid; gap: 8px; align-content: start; }
+  code, .m-code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.8125rem; }
+
+  /* Rampas */
+  .m-ramp { display: grid; grid-template-columns: 96px repeat(12, minmax(0, 1fr)); gap: 4px; align-items: stretch; }
+  .m-ramp__name { align-self: center; color: var(--ug-color-text-secondary); font-size: var(--ug-text-label); }
+  .m-swatch { display: grid; gap: 4px; color: var(--ug-color-text-secondary); font-size: var(--ug-text-caption); line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .m-swatch__chip { height: 48px; border-radius: var(--ug-radius-sm); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.06); }
+  .m-swatch--empty .m-swatch__chip { background: repeating-linear-gradient(135deg, transparent 0 6px, oklch(1 0 0 / 0.04) 6px 12px); box-shadow: none; }
+  .m-steps { display: grid; grid-template-columns: 96px repeat(12, minmax(0, 1fr)); gap: 4px; color: var(--ug-color-text-secondary); font-size: 11px; text-align: center; }
+
+  .m-table { width: 100%; border-collapse: collapse; font-size: var(--ug-text-label); }
+  .m-table th, .m-table td { padding: 8px 10px; text-align: start; border-block-end: 1px solid var(--ug-color-separator); vertical-align: middle; }
+  .m-table thead th { color: var(--ug-color-text-secondary); font-weight: var(--ug-weight-regular); font-size: var(--ug-text-caption); }
+  .m-table .num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .m-dot { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-inline-end: 8px; box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.12); }
+
+  .m-type { display: grid; gap: 14px; }
+  .m-type__row { display: grid; grid-template-columns: 180px 1fr; gap: 16px; align-items: baseline; padding-block-end: 14px; border-block-end: 1px solid var(--ug-color-separator); }
+
+  .m-spaces { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; }
+  .m-space { display: grid; gap: 6px; justify-items: start; }
+  .m-space__bar { height: 24px; background: var(--ug-color-accent-subtle); box-shadow: inset 0 0 0 1px var(--ug-color-accent-border); border-radius: 2px; }
+  .m-boxes { display: flex; flex-wrap: wrap; gap: 16px; }
+  .m-box { display: grid; place-items: center; width: 120px; height: 72px; background: var(--ug-color-bg-surface); color: var(--ug-color-text-secondary); font-size: var(--ug-text-caption); text-align: center; }
+
+  /* ---- Maquetas de Steam ---- */
+  .steam {
+    padding: 24px;
+    border-radius: var(--ug-radius-lg);
+    background: #1b2838;
+    color: #c6d4df;
+    font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+    font-size: 13px;
+  }
+  .steam-purchase {
+    position: relative;
+    display: grid;
+    gap: 12px;
+    max-width: 616px;
+    padding: 16px 16px 30px;
+    border-radius: 4px;
+    background: linear-gradient(-60deg, rgba(226,244,255,.3) 5%, rgba(84,107,115,.3) 95%);
+  }
+  .steam-purchase + .steam-purchase { margin-block-start: 28px; }
+  .steam-title { margin: 0; color: #fff; font-size: 21px; font-weight: 400; font-family: "Motiva Sans", Arial, sans-serif; }
+  .steam-action {
+    position: absolute; inset-inline-end: 16px; inset-block-end: -16px;
+    display: flex; align-items: center; padding: 2px; background: #000; border-radius: 2px;
+  }
+  .steam-action .price { padding: 0 12px; color: #fff; font-size: 14px; }
+  .steam-action .disc { display: flex; align-items: center; gap: 0; }
+  .steam-action .pct { padding: 0 6px; background: #4c6b22; color: #beee11; font-size: 26px; line-height: 32px; }
+  .steam-action .orig { padding: 0 8px; background: #344654; font-size: 11px; line-height: 1.1; }
+  .steam-action .orig s { color: #738895; }
+  .steam-action .orig b { display: block; color: #beee11; font-size: 15px; font-weight: 400; }
+  .steam-action .btn {
+    padding: 0 15px; line-height: 30px; border-radius: 2px; color: #d2efa9; font-size: 15px;
+    background: linear-gradient(to right, #75b022 5%, #588a1b 95%);
+  }
+  .steam-search { display: grid; gap: 4px; max-width: 980px; }
+  .steam-row {
+    display: grid; grid-template-columns: 120px minmax(0, 1fr) 120px 160px 210px; gap: 12px; align-items: center;
+    padding: 4px; background: rgba(0,0,0,.2); color: #c6d4df; text-decoration: none;
+  }
+  .steam-row:hover { background: rgba(0,0,0,.4); }
+  .steam-row:focus-visible { outline: 2px solid #66c0f4; }
+  .steam-row img { display: block; width: 120px; height: 45px; object-fit: cover; }
+  .steam-row .title { color: #c7d5e0; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .steam-row .date { color: #4c6b8a; font-size: 11px; }
+  .steam-row .price { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+  .steam-row .price .pct { padding: 0 4px; background: #4c6b22; color: #beee11; font-size: 13px; line-height: 20px; }
+  .steam-row .price .final { color: #fff; font-size: 12px; }
+  .steam-row .price .old { color: #738895; font-size: 11px; text-decoration: line-through; }
+  .steam-row .ug-slot { display: flex; justify-content: flex-start; }
+
+  .m-tooltip-static { position: static; display: block; }
+
+  /* Ancla del tooltip en vivo */
+  .m-anchor-1 { anchor-name: --ug-chip-1; }
+  #tip-live {
+    position-anchor: --ug-chip-1;
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block;
+    inset: auto;
+    margin: 6px 0 0;
+  }
+
+  .m-popups { display: flex; flex-wrap: wrap; gap: 24px; align-items: start; }
+  .m-popup-frame { border-radius: var(--ug-radius-lg); box-shadow: var(--ug-shadow-raised); overflow: hidden; }
+</style>
+</head>
+<body class="ug-root">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect vector-effect="non-scaling-stroke" x="9" y="9" width="12" height="12" rx="2"/><path vector-effect="non-scaling-stroke" d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path vector-effect="non-scaling-stroke" d="M21 3v5h-5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path vector-effect="non-scaling-stroke" d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-offline" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M2 2l20 20M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.7M19 12.9a10 10 0 0 0-2.2-1.6M2 8.8a15 15 0 0 1 4.2-2.6M10.7 5a15 15 0 0 1 11.3 3.8M12 20h.01"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M20 7h-9M14 17H4M17 4v6M7 14v6M4 7h5M20 17h-3"/></symbol>
+    <symbol id="i-ban" viewBox="0 0 24 24"><circle vector-effect="non-scaling-stroke" cx="12" cy="12" r="9"/><path vector-effect="non-scaling-stroke" d="m5.6 5.6 12.8 12.8"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle vector-effect="non-scaling-stroke" cx="12" cy="12" r="9"/><path vector-effect="non-scaling-stroke" d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle vector-effect="non-scaling-stroke" cx="12" cy="12" r="9"/><path vector-effect="non-scaling-stroke" d="M12 16v-4.5M12 8h.01"/></symbol>
+  </defs>
+</svg>
+
+<main class="m-wrap">
+
+  <header class="m-intro">
+    <h1><span class="ug-mark">UG</span> Sistema de diseño</h1>
+    <p>Tokens y piezas de Steam Precios UG, todavía sin conectar a datos reales. Las cifras salen de las fórmulas del traspaso con 41,6₴ por USD, 7,78 HK$ por USD, P2P a Bs&nbsp;1.078 y 3&nbsp;% de recargo. Los precios de otras regiones son de ejemplo.</p>
+    <nav class="m-toc" aria-label="Secciones">
+      <a class="ug-btn ug-btn--secondary ug-btn--sm" href="#color">Color</a>
+      <a class="ug-btn ug-btn--secondary ug-btn--sm" href="#tipografia">Tipografía</a>
+      <a class="ug-btn ug-btn--secondary ug-btn--sm" href="#forma">Espacio, forma y movimiento</a>
+      <a class="ug-btn ug-btn--secondary ug-btn--sm" href="#tarjeta">Tarjeta de precio</a>
+      <a class="ug-btn ug-btn--secondary ug-btn--sm" href="#etiqueta">Etiqueta compacta</a>
+      <a class="ug-btn ug-btn--secondary ug-btn--sm" href="#popup">Popup</a>
+      <a class="ug-btn ug-btn--secondary ug-btn--sm" href="#ajustes">Ajustes</a>
+    </nav>
+  </header>
+
+  <!-- ================================================================== -->
+  <section class="m-section" id="color">
+    <h2>Color</h2>
+    <p class="m-lead">Un neutro frío de la familia de Steam, con menos croma, para que las superficies se lean como propias sin chocar. El acento es el amarillo de la bandera de Ucrania: queda lejos del azul (tono 236) y del verde lima (123) de Steam, y es lo que identifica a la extensión. Solo hay tres estados, porque la interfaz solo muestra esos tres: error, aviso y éxito.</p>
+
+    <div class="m-sub">
+      <h3>Rampas</h3>
+      <p class="m-caption">Pasos con papel fijo, como en Radix. Solo existen los pasos que usa algún token; las casillas rayadas no se generan.</p>
+      <div class="m-steps" aria-hidden="true"><span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
+      <div id="ramps" style="display:grid; gap:4px"></div>
+    </div>
+
+    <div class="m-sub">
+      <h3>Papeles y contraste medido</h3>
+      <p class="m-caption">Medido con <code>npm run paleta</code> (culori y apca-w3) sobre el fondo real de cada par. WCAG 2 para el cumplimiento; APCA como referencia, en valor absoluto.</p>
+      <table class="m-table">
+        <thead><tr><th scope="col">Par</th><th scope="col">Uso</th><th scope="col" class="num">WCAG</th><th scope="col" class="num">APCA Lc</th></tr></thead>
+        <tbody>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-text-primary)"></span>text-primary / bg-surface</td><td>Cifras y títulos</td><td class="num">15,48:1</td><td class="num">95,7</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-text-secondary)"></span>text-secondary / bg-surface</td><td>Etiquetas, notas</td><td class="num">10,61:1</td><td class="num">71,9</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-text-secondary)"></span>text-secondary / bg-component-active</td><td>El peor fondo del texto secundario</td><td class="num">7,94:1</td><td class="num">68,1</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-text-disabled)"></span>text-disabled / bg-component</td><td>Desactivado, exento</td><td class="num">4,17:1</td><td class="num">32,7</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-accent-text)"></span>accent-text / accent-subtle</td><td>Botón «en la lista»</td><td class="num">10,51:1</td><td class="num">79,5</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-accent-solid)"></span>text-on-accent / accent-solid</td><td>Botón principal</td><td class="num">12,91:1</td><td class="num">80,9</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-danger-text)"></span>danger-text / danger-subtle</td><td>Errores</td><td class="num">7,97:1</td><td class="num">63,0</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-warning-text)"></span>warning-text / warning-subtle</td><td>Tasas viejas, sin conexión</td><td class="num">8,54:1</td><td class="num">67,0</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-success-text)"></span>success-text / success-subtle</td><td>Descuento, más barato</td><td class="num">8,37:1</td><td class="num">66,4</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-border-strong)"></span>border-strong / bg-surface</td><td>Límite de campos (1.4.11, 3:1)</td><td class="num">3,39:1</td><td class="num">24,5</td></tr>
+          <tr><td><span class="m-dot" style="background:var(--ug-color-border-focus)"></span>border-focus / gris de compra de Steam</td><td>Anillo de foco, peor caso</td><td class="num">4,03:1</td><td class="num">58,1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section class="m-section" id="tipografia">
+    <h2>Tipografía</h2>
+    <p class="m-lead">La fuente del sistema (Segoe UI en Windows): no hay que cargar nada y se distingue de la Motiva Sans de Steam. Solo pesos 400 y 600, porque Segoe UI no trae 500 en Windows 10. Todas las cifras usan <code>tabular-nums</code>.</p>
+    <div class="m-type">
+      <div class="m-type__row"><span class="m-caption">Title · 24/1,15 · 600</span><span class="ug-num" style="font-size:var(--ug-text-title);line-height:var(--ug-leading-title);font-weight:600;letter-spacing:var(--ug-tracking-title)">2&nbsp;039₴</span></div>
+      <div class="m-type__row"><span class="m-caption">Figure · 20/1,2 · 600</span><span class="ug-num" style="font-size:var(--ug-text-figure);line-height:var(--ug-leading-figure);font-weight:600">HK$&nbsp;336.45 · 44,54 USDT · Bs&nbsp;48.016,87</span></div>
+      <div class="m-type__row"><span class="m-caption">Heading · 16/1,3 · 600</span><span style="font-size:var(--ug-text-heading);line-height:var(--ug-leading-heading);font-weight:600">Lista UG</span></div>
+      <div class="m-type__row"><span class="m-caption">Body · 14/1,45 · 400</span><span style="font-size:var(--ug-text-body);line-height:var(--ug-leading-body)">Los precios se refrescan al abrir el popup.</span></div>
+      <div class="m-type__row"><span class="m-caption">Label · 13/1,3 · 600 o 400</span><span style="font-size:var(--ug-text-label);line-height:var(--ug-leading-label);font-weight:600">Comparar regiones</span></div>
+      <div class="m-type__row"><span class="m-caption">Caption · 12/1,35 · 400</span><span class="m-caption" style="color:var(--ug-color-text-secondary)">Binance P2P · hace 3 min</span></div>
+    </div>
+    <table class="m-table">
+      <thead><tr><th scope="col">Moneda</th><th scope="col">Formato</th><th scope="col" class="num">Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td>Grivnas</td><td>Espacio fijo para miles, ₴ detrás</td><td class="num">1&nbsp;799₴</td></tr>
+        <tr><td>Dólares de Hong Kong</td><td>Punto decimal</td><td class="num">HK$&nbsp;336.45</td></tr>
+        <tr><td>USDT</td><td>Coma decimal</td><td class="num">44,54 USDT</td></tr>
+        <tr><td>Bolívares</td><td>Punto para miles y coma decimal</td><td class="num">Bs&nbsp;48.016,87</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ================================================================== -->
+  <section class="m-section" id="forma">
+    <h2>Espacio, forma y movimiento</h2>
+    <div class="m-sub">
+      <h3>Espaciado, base 4px</h3>
+      <div class="m-spaces">
+        <div class="m-space"><div class="m-space__bar" style="width:2px"></div><span class="m-caption">0-5 · 2</span></div>
+        <div class="m-space"><div class="m-space__bar" style="width:4px"></div><span class="m-caption">1 · 4</span></div>
+        <div class="m-space"><div class="m-space__bar" style="width:6px"></div><span class="m-caption">1-5 · 6</span></div>
+        <div class="m-space"><div class="m-space__bar" style="width:8px"></div><span class="m-caption">2 · 8</span></div>
+        <div class="m-space"><div class="m-space__bar" style="width:12px"></div><span class="m-caption">3 · 12</span></div>
+        <div class="m-space"><div class="m-space__bar" style="width:16px"></div><span class="m-caption">4 · 16</span></div>
+        <div class="m-space"><div class="m-space__bar" style="width:20px"></div><span class="m-caption">5 · 20</span></div>
+        <div class="m-space"><div class="m-space__bar" style="width:24px"></div><span class="m-caption">6 · 24</span></div>
+        <div class="m-space"><div class="m-space__bar" style="width:32px"></div><span class="m-caption">8 · 32</span></div>
+      </div>
+    </div>
+    <div class="m-sub">
+      <h3>Radios y sombras</h3>
+      <div class="m-boxes">
+        <div class="m-box ug-surface" style="border-radius:var(--ug-radius-sm)">sm · 4<br>chips</div>
+        <div class="m-box ug-surface" style="border-radius:var(--ug-radius-md)">md · 6<br>botones, campos</div>
+        <div class="m-box ug-surface">lg · 10<br>tarjetas</div>
+        <div class="m-box" style="border-radius:var(--ug-radius-md);background:var(--ug-color-bg-raised);box-shadow:var(--ug-shadow-raised);border:1px solid transparent">raised<br>tooltips</div>
+      </div>
+    </div>
+    <div class="m-sub">
+      <h3>Botones y foco</h3>
+      <p class="m-caption">Pulsa Tab para ver el anillo de foco. Al pulsar, el botón se encoge a 0,96 en 150 ms, salvo con movimiento reducido.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <button class="ug-btn ug-btn--accent" type="button"><svg class="ug-icon" aria-hidden="true"><use href="#i-plus"/></svg>Lista UG</button>
+        <button class="ug-btn ug-btn--secondary" type="button"><svg class="ug-icon" aria-hidden="true"><use href="#i-refresh"/></svg>Reintentar</button>
+        <button class="ug-btn ug-btn--ghost" type="button">Vaciar lista</button>
+        <button class="ug-btn ug-btn--secondary" type="button" disabled>Desactivado</button>
+        <button class="ug-btn ug-btn--ghost ug-btn--icon" type="button" aria-label="Abrir los ajustes"><svg class="ug-icon" aria-hidden="true"><use href="#i-sliders"/></svg></button>
+        <span class="ug-badge ug-badge--success">−40&nbsp;%</span>
+        <span class="ug-badge">Más barata</span>
+        <span class="ug-badge ug-badge--accent">2 juegos</span>
+      </div>
+    </div>
+    <div class="m-sub">
+      <h3>Movimiento</h3>
+      <table class="m-table">
+        <thead><tr><th scope="col">Token</th><th scope="col" class="num">Valor</th><th scope="col">Uso</th></tr></thead>
+        <tbody>
+          <tr><td><code>--ug-duration-instant</code></td><td class="num">100 ms</td><td>Hover de filas y botones, solo color</td></tr>
+          <tr><td><code>--ug-duration-fast</code></td><td class="num">150 ms</td><td>Pulsar, salidas, tooltip</td></tr>
+          <tr><td><code>--ug-duration-base</code></td><td class="num">200 ms</td><td>Desplegar la comparación de regiones</td></tr>
+          <tr><td><code>--ug-duration-enter</code></td><td class="num">300 ms</td><td>Cambio de icono: copiar → copiado, + → ✓</td></tr>
+          <tr><td><code>--ug-ease-icon</code></td><td class="num"><code>cubic-bezier(0.2, 0, 0, 1)</code></td><td>Cambio de icono; el resto usa <code>ease-out</code></td></tr>
+        </tbody>
+      </table>
+      <p class="m-caption">Con <code>prefers-reduced-motion: reduce</code> quedan solo los fundidos de opacidad: no hay escala al pulsar, ni giro de la flecha, ni desenfoque de iconos, ni pulso en la carga.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section class="m-section" id="tarjeta">
+    <h2>Tarjeta de precio</h2>
+    <p class="m-lead">Va dentro de cada edición comprable, debajo del botón de Steam. El precio en ₴ sale arriba como origen, porque la página ya lo muestra; lo nuevo son las tres cifras grandes. «+ Lista UG» es el único botón relleno. La comparación de regiones está plegada y su pista dice lo importante sin abrirla.</p>
+
+    <div class="steam">
+      <div class="steam-purchase">
+        <div class="steam-title">Comprar ELDEN RING</div>
+        <div class="steam-action"><span class="price">1&nbsp;799₴</span><span class="btn">Añadir al carro</span></div>
+      </div>
+      <div style="max-width:616px;margin-block-start:28px">
+        <div role="group" class="ug-surface ug-card" aria-label="Precio UG de ELDEN RING">
+          <div class="ug-card__head">
+            <span class="ug-mark" aria-hidden="true">UG</span>
+            <p class="ug-card__source"><strong class="ug-num">1&nbsp;799₴</strong> en Steam Ucrania</p>
+            <button class="ug-btn ug-btn--accent" type="button" aria-pressed="false" aria-label="Lista UG: ELDEN RING" data-toggle-list>
+              <span class="ug-swap" aria-hidden="true">
+                <svg class="ug-icon" data-when="off"><use href="#i-plus"/></svg>
+                <svg class="ug-icon" data-when="on"><use href="#i-check"/></svg>
+              </span>
+              Lista UG
+            </button>
+          </div>
+          <dl class="ug-figures">
+            <div class="ug-figure"><dt>Tarjeta de Hong Kong</dt><dd>HK$&nbsp;336.45</dd></div>
+            <div class="ug-figure"><dt>En Binance</dt><dd>44,54 <small>USDT</small></dd></div>
+            <div class="ug-figure"><dt>En bolívares</dt><dd>Bs&nbsp;48.016,87</dd></div>
+          </dl>
+          <details class="ug-disclosure">
+            <summary>
+              <svg class="ug-icon ug-disclosure__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+              Comparar regiones
+              <span class="ug-disclosure__hint"><svg class="ug-icon ug-icon--regular" aria-hidden="true"><use href="#i-info"/></svg>Argentina sale 17&nbsp;% más barata</span>
+            </summary>
+            <div class="ug-disclosure__panel">
+              <table class="ug-table">
+                <caption class="ug-visually-hidden">Precio de ELDEN RING por región, de más barata a más cara</caption>
+                <thead><tr><th scope="col">Región</th><th scope="col" class="ug-col-num">Precio local</th><th scope="col" class="ug-col-num">En USD</th><th scope="col" class="ug-col-num">Frente a Ucrania</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row"><span class="ug-table__region">Argentina <span class="ug-badge">Más barata</span></span></th><td class="ug-col-num">$35.99</td><td class="ug-col-num">$35.99</td><td class="ug-col-num">−17&nbsp;%</td></tr>
+                  <tr class="ug-row-self"><th scope="row"><span class="ug-table__region">Ucrania <span class="ug-badge ug-badge--accent">Tu región</span></span></th><td class="ug-col-num">1&nbsp;799₴</td><td class="ug-col-num">$43.25</td><td class="ug-col-num">—</td></tr>
+                  <tr><th scope="row">Kazajistán</th><td class="ug-col-num">22&nbsp;990₸</td><td class="ug-col-num">$44.21</td><td class="ug-col-num">+2&nbsp;%</td></tr>
+                  <tr><th scope="row">Brasil</th><td class="ug-col-num">R$&nbsp;249,90</td><td class="ug-col-num">$44.63</td><td class="ug-col-num">+3&nbsp;%</td></tr>
+                  <tr><th scope="row">Turquía</th><td class="ug-col-num">$44.99</td><td class="ug-col-num">$44.99</td><td class="ug-col-num">+4&nbsp;%</td></tr>
+                  <tr><th scope="row">Estados Unidos</th><td class="ug-col-num">$59.99</td><td class="ug-col-num">$59.99</td><td class="ug-col-num">+39&nbsp;%</td></tr>
+                  <tr><th scope="row">Hong Kong</th><td class="ug-col-num">HK$&nbsp;468.00</td><td class="ug-col-num">$60.15</td><td class="ug-col-num">+39&nbsp;%</td></tr>
+                  <tr><th scope="row">Polonia</th><td class="ug-col-num">249,00&nbsp;zł</td><td class="ug-col-num">$62.25</td><td class="ug-col-num">+44&nbsp;%</td></tr>
+                  <tr><th scope="row">Alemania</th><td class="ug-col-num">59,99&nbsp;€</td><td class="ug-col-num">$65.21</td><td class="ug-col-num">+51&nbsp;%</td></tr>
+                  <tr class="ug-row-muted"><th scope="row">Rusia</th><td class="ug-col-num" colspan="3">No se vende en esta región</td></tr>
+                </tbody>
+              </table>
+              <p class="ug-table__foot">Precios pasados a USD con la tasa de mercado. No incluye lo que cuesta comprar tarjetas de cada región.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-sub">
+      <h3>Con descuento y ya en la lista</h3>
+      <div class="steam" style="padding:16px">
+        <div style="max-width:616px">
+          <div role="group" class="ug-surface ug-card" aria-label="Precio UG de ELDEN RING Shadow of the Erdtree Edition">
+            <div class="ug-card__head">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <p class="ug-card__source"><s class="ug-num">4&nbsp;999₴</s> <strong class="ug-num">2&nbsp;999₴</strong> en Steam Ucrania <span class="ug-badge ug-badge--success">−40&nbsp;%</span></p>
+              <button class="ug-btn ug-btn--accent" type="button" aria-pressed="true" aria-label="Lista UG: ELDEN RING Shadow of the Erdtree Edition" data-toggle-list>
+                <span class="ug-swap" aria-hidden="true">
+                  <svg class="ug-icon" data-when="off"><use href="#i-plus"/></svg>
+                  <svg class="ug-icon" data-when="on"><use href="#i-check"/></svg>
+                </span>
+                Lista UG
+              </button>
+            </div>
+            <dl class="ug-figures">
+              <div class="ug-figure"><dt>Tarjeta de Hong Kong</dt><dd>HK$&nbsp;560.87</dd></div>
+              <div class="ug-figure"><dt>En Binance</dt><dd>74,25 <small>USDT</small></dd></div>
+              <div class="ug-figure"><dt>En bolívares</dt><dd>Bs&nbsp;80.045,91</dd></div>
+            </dl>
+            <details class="ug-disclosure">
+              <summary>
+                <svg class="ug-icon ug-disclosure__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+                Comparar regiones
+                <span class="ug-disclosure__hint ug-disclosure__hint--success"><svg class="ug-icon ug-icon--regular" aria-hidden="true"><use href="#i-check-circle"/></svg>La más barata de 9 regiones</span>
+              </summary>
+              <div class="ug-disclosure__panel"><p class="ug-table__foot">(Misma tabla que arriba.)</p></div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-sub">
+      <h3>Estados</h3>
+      <div class="m-grid">
+        <div class="m-state">
+          <span class="m-caption">Cargando</span>
+          <div role="group" class="ug-surface ug-card" aria-label="Precio UG de ELDEN RING" aria-busy="true">
+            <div class="ug-card__head">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <p class="ug-card__source"><span class="ug-skeleton" style="width:9em"></span><span class="ug-visually-hidden">Buscando el precio en Ucrania…</span></p>
+            </div>
+            <dl class="ug-figures" aria-hidden="true">
+              <div class="ug-figure"><dt>Tarjeta de Hong Kong</dt><dd><span class="ug-skeleton"></span></dd></div>
+              <div class="ug-figure"><dt>En Binance</dt><dd><span class="ug-skeleton" style="width:5em"></span></dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="m-state">
+          <span class="m-caption">Error de Steam</span>
+          <div role="group" class="ug-surface ug-card" aria-label="Precio UG de ELDEN RING">
+            <div class="ug-card__head">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <p class="ug-card__source">Precio en Steam Ucrania</p>
+            </div>
+            <div class="ug-notice ug-notice--danger">
+              <svg class="ug-icon" aria-hidden="true"><use href="#i-alert"/></svg>
+              <div class="ug-notice__body">
+                <p>No se pudo obtener el precio en Ucrania.</p>
+                <p>Steam no respondió. Vuelve a intentarlo en un momento.</p>
+              </div>
+              <button class="ug-btn ug-btn--secondary ug-btn--sm" type="button">Reintentar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="m-state">
+          <span class="m-caption">Sin conexión, con la última tasa</span>
+          <div role="group" class="ug-surface ug-card" aria-label="Precio UG de Portal 2">
+            <div class="ug-card__head">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <p class="ug-card__source"><strong class="ug-num">240₴</strong> en Steam Ucrania</p>
+              <button class="ug-btn ug-btn--accent" type="button" aria-pressed="false" aria-label="Lista UG: Portal 2" data-toggle-list>
+                <span class="ug-swap" aria-hidden="true"><svg class="ug-icon" data-when="off"><use href="#i-plus"/></svg><svg class="ug-icon" data-when="on"><use href="#i-check"/></svg></span>
+                Lista UG
+              </button>
+            </div>
+            <dl class="ug-figures">
+              <div class="ug-figure"><dt>Tarjeta de Hong Kong</dt><dd>HK$&nbsp;44.88</dd></div>
+              <div class="ug-figure"><dt>En Binance</dt><dd>5,94 <small>USDT</small></dd></div>
+              <div class="ug-figure"><dt>En bolívares</dt><dd>Bs&nbsp;6.405,81</dd></div>
+            </dl>
+            <div class="ug-notice ug-notice--warning">
+              <svg class="ug-icon" aria-hidden="true"><use href="#i-offline"/></svg>
+              <div class="ug-notice__body"><p>Sin conexión. Las cifras usan las tasas de hace 3&nbsp;h.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="m-state">
+          <span class="m-caption">Gratis</span>
+          <div role="group" class="ug-surface ug-card ug-card--compact" aria-label="Precio UG de Dota 2">
+            <div class="ug-card__head">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <p class="ug-card__source"><strong>Gratis</strong> en Steam Ucrania</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="m-state">
+          <span class="m-caption">No disponible en Ucrania</span>
+          <div role="group" class="ug-surface ug-card" aria-label="Precio UG de esta edición">
+            <div class="ug-card__head">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <p class="ug-card__source"><svg class="ug-icon ug-icon--regular" aria-hidden="true" style="align-self:center"><use href="#i-ban"/></svg><strong>No se vende en Steam Ucrania</strong></p>
+            </div>
+            <p class="ug-card__note">Esta edición no está a la venta en la región Ucrania. Compara su precio en otras regiones.</p>
+            <details class="ug-disclosure">
+              <summary>
+                <svg class="ug-icon ug-disclosure__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+                Comparar regiones
+                <span class="ug-disclosure__hint">Desde $35.99</span>
+              </summary>
+              <div class="ug-disclosure__panel"><p class="ug-table__foot">(Tabla de regiones.)</p></div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section class="m-section" id="etiqueta">
+    <h2>Etiqueta compacta</h2>
+    <p class="m-lead">Al lado de cada precio en búsquedas, ofertas, DLC y listas. Solo Bs y HK$; el detalle sale en un tooltip al pasar el ratón por la etiqueta o al enfocar la fila con el teclado. La etiqueta no es un botón, porque vive dentro del enlace de la fila. Los juegos gratis no llevan etiqueta.</p>
+
+    <div class="steam">
+      <div class="steam-search">
+        <a class="steam-row" href="#etiqueta" data-tip-row aria-describedby="tip-live">
+          <img src="https://cdn.akamai.steamstatic.com/steam/apps/620/capsule_sm_120.jpg" alt="">
+          <div><div class="title">Portal 2</div><div class="date">18 abr 2011</div></div>
+          <div></div>
+          <div class="price"><span class="final">240,00₴</span></div>
+          <div class="ug-slot">
+            <span class="ug-chip m-anchor-1" data-tip-chip>
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <span>Bs&nbsp;6.406</span><span class="ug-chip__sep" aria-hidden="true">·</span><span class="ug-chip__muted">HK$&nbsp;44.88</span>
+            </span>
+          </div>
+        </a>
+        <a class="steam-row" href="#etiqueta">
+          <img src="https://cdn.akamai.steamstatic.com/steam/apps/367520/capsule_sm_120.jpg" alt="">
+          <div><div class="title">Hollow Knight</div><div class="date">24 feb 2017</div></div>
+          <div></div>
+          <div class="price"><span class="pct">−65%</span><span><span class="old">489,00₴</span><br><span class="final">169,00₴</span></span></div>
+          <div class="ug-slot">
+            <span class="ug-chip">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <span>Bs&nbsp;4.511</span><span class="ug-chip__sep" aria-hidden="true">·</span><span class="ug-chip__muted">HK$&nbsp;31.61</span>
+            </span>
+          </div>
+        </a>
+        <a class="steam-row" href="#etiqueta">
+          <img src="https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_sm_120.jpg" alt="">
+          <div><div class="title">ELDEN RING</div><div class="date">24 feb 2022</div></div>
+          <div></div>
+          <div class="price"><span class="final">$59.99</span></div>
+          <div class="ug-slot">
+            <span class="ug-chip">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <span>Bs&nbsp;48.017</span><span class="ug-chip__sep" aria-hidden="true">·</span><span class="ug-chip__muted">HK$&nbsp;336.45</span>
+            </span>
+          </div>
+        </a>
+        <a class="steam-row" href="#etiqueta">
+          <img src="https://cdn.akamai.steamstatic.com/steam/apps/570/capsule_sm_120.jpg" alt="">
+          <div><div class="title">Dota 2</div><div class="date">9 jul 2013</div></div>
+          <div></div>
+          <div class="price"><span class="final">Free</span></div>
+          <div class="ug-slot"></div>
+        </a>
+      </div>
+      <p class="m-caption" style="margin-top:12px;color:#8f98a0">La tercera fila sale en dólares, como con una VPN: la etiqueta pide el precio de Ucrania igual. Pasa el ratón por la primera etiqueta o enfoca su fila con Tab.</p>
+    </div>
+
+    <div id="tip-live" class="ug-tooltip" popover="manual" role="tooltip">
+      <p class="ug-tooltip__title">Portal 2 en Steam Ucrania</p>
+      <dl>
+        <dt>Precio</dt><dd>240₴</dd>
+        <dt>Tarjeta de Hong Kong</dt><dd>HK$&nbsp;44.88</dd>
+        <dt>En Binance</dt><dd>5,94 USDT</dd>
+        <dt>En bolívares</dt><dd>Bs&nbsp;6.405,81</dd>
+      </dl>
+      <p class="ug-tooltip__foot">Ucrania es la más barata de 9 regiones.</p>
+    </div>
+
+    <div class="m-sub">
+      <h3>Tooltip</h3>
+      <div class="ug-tooltip m-tooltip-static">
+        <p class="ug-tooltip__title">Portal 2 en Steam Ucrania</p>
+        <dl>
+          <dt>Precio</dt><dd>240₴</dd>
+          <dt>Tarjeta de Hong Kong</dt><dd>HK$&nbsp;44.88</dd>
+          <dt>En Binance</dt><dd>5,94 USDT</dd>
+          <dt>En bolívares</dt><dd>Bs&nbsp;6.405,81</dd>
+        </dl>
+        <p class="ug-tooltip__foot">Ucrania es la más barata de 9 regiones.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section class="m-section" id="popup">
+    <h2>Popup</h2>
+    <p class="m-lead">360 px de ancho. Arriba la Lista UG, luego el total con el mismo orden de cifras que la tarjeta, el saldo opcional, el único botón relleno («Copiar resumen») y abajo las tasas con su antigüedad. Vaciar la lista se deshace en vez de pedir confirmación.</p>
+
+    <div class="m-popups">
+      <!-- Con lista -->
+      <div class="m-popup-frame">
+        <div class="ug-popup">
+          <header class="ug-popup__head">
+            <span class="ug-mark" aria-hidden="true">UG</span>
+            <h1>Lista UG</h1>
+            <span class="ug-badge">2 juegos</span>
+            <button class="ug-btn ug-btn--ghost ug-btn--icon" type="button" aria-label="Abrir los ajustes"><svg class="ug-icon" aria-hidden="true"><use href="#i-sliders"/></svg></button>
+          </header>
+
+          <section class="ug-surface ug-section" aria-labelledby="h-juegos">
+            <div class="ug-section__head">
+              <h2 class="ug-section__title" id="h-juegos">Juegos</h2>
+              <button class="ug-btn ug-btn--ghost ug-btn--sm" type="button">Vaciar lista</button>
+            </div>
+            <ul class="ug-list">
+              <li class="ug-item">
+                <img class="ug-item__img" src="https://cdn.akamai.steamstatic.com/steam/apps/1245620/capsule_sm_120.jpg" alt="">
+                <div class="ug-item__text"><a class="ug-item__name" href="#popup">ELDEN RING</a><span class="ug-item__meta">Edición estándar</span></div>
+                <span class="ug-item__price">1&nbsp;799₴</span>
+                <button class="ug-btn ug-btn--ghost ug-btn--icon ug-btn--sm" type="button" aria-label="Quitar ELDEN RING de la lista"><svg class="ug-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+              </li>
+              <li class="ug-item">
+                <img class="ug-item__img" src="https://cdn.akamai.steamstatic.com/steam/apps/620/capsule_sm_120.jpg" alt="">
+                <div class="ug-item__text"><a class="ug-item__name" href="#popup">Portal 2</a><span class="ug-item__meta">Juego base</span></div>
+                <span class="ug-item__price">240₴</span>
+                <button class="ug-btn ug-btn--ghost ug-btn--icon ug-btn--sm" type="button" aria-label="Quitar Portal 2 de la lista"><svg class="ug-icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+              </li>
+            </ul>
+          </section>
+
+          <section class="ug-surface ug-section" aria-labelledby="h-total">
+            <div class="ug-total">
+              <h2 class="ug-section__title" id="h-total">Total</h2>
+              <p class="ug-total__amount">2&nbsp;039₴</p>
+            </div>
+            <dl class="ug-figures ug-figures--compact">
+              <div class="ug-figure"><dt>Tarjeta HK</dt><dd>HK$&nbsp;381.33</dd></div>
+              <div class="ug-figure"><dt>Binance</dt><dd>50,48 <small>USDT</small></dd></div>
+              <div class="ug-figure"><dt>Bolívares</dt><dd>Bs&nbsp;54.422,67</dd></div>
+            </dl>
+            <div class="ug-field">
+              <label class="ug-label" for="saldo">Saldo en la billetera<span class="ug-visually-hidden">, en grivnas</span></label>
+              <div class="ug-input-wrap ug-input--narrow">
+                <input class="ug-input" id="saldo" name="saldo" type="text" inputmode="decimal" autocomplete="off" value="500" aria-describedby="saldo-res">
+                <span class="ug-input-wrap__affix" aria-hidden="true">₴</span>
+              </div>
+              <p class="ug-balance ug-balance--short" id="saldo-res"><svg class="ug-icon ug-icon--regular" aria-hidden="true"><use href="#i-info"/></svg><span>Falta recargar <b class="ug-num">1&nbsp;539₴</b> ≈ <b class="ug-num">HK$&nbsp;287.82</b></span></p>
+            </div>
+            <button class="ug-btn ug-btn--accent ug-btn--lg ug-btn--block" type="button" data-copy data-state="off">
+              <span class="ug-swap" aria-hidden="true">
+                <svg class="ug-icon" data-when="off"><use href="#i-copy"/></svg>
+                <svg class="ug-icon" data-when="on"><use href="#i-check"/></svg>
+              </span>
+              <span data-copy-label>Copiar resumen</span>
+            </button>
+            <p class="ug-visually-hidden" role="status" data-copy-status></p>
+          </section>
+
+          <footer class="ug-rates">
+            <dl>
+              <div><dt>1 USDT</dt><dd>Bs&nbsp;1.078,00</dd><dd>Binance P2P · hace 3&nbsp;min</dd></div>
+              <div><dt>1 HK$</dt><dd>5,35₴</dd><dd>Mercado · hace 2&nbsp;h</dd></div>
+              <div><dt>1 HK$</dt><dd>0,1324 USDT</dd><dd>Mercado + 3&nbsp;%</dd></div>
+            </dl>
+            <button class="ug-btn ug-btn--ghost ug-btn--icon" type="button" aria-label="Actualizar tasas"><svg class="ug-icon" aria-hidden="true"><use href="#i-refresh"/></svg></button>
+          </footer>
+        </div>
+      </div>
+
+      <!-- Vacía + deshacer -->
+      <div style="display:grid;gap:24px">
+        <div class="m-popup-frame">
+          <div class="ug-popup">
+            <header class="ug-popup__head">
+              <span class="ug-mark" aria-hidden="true">UG</span>
+              <h1>Lista UG</h1>
+              <button class="ug-btn ug-btn--ghost ug-btn--icon" type="button" aria-label="Abrir los ajustes"><svg class="ug-icon" aria-hidden="true"><use href="#i-sliders"/></svg></button>
+            </header>
+            <section class="ug-surface ug-empty">
+              <p class="ug-empty__title">La lista está vacía</p>
+              <p class="ug-empty__text">Pulsa «Lista UG» en la página de un juego para sumar su precio aquí.</p>
+              <a class="ug-btn ug-btn--secondary" href="#popup">Abrir la tienda</a>
+            </section>
+            <div class="ug-snackbar" role="status">
+              <span>Lista vaciada.</span>
+              <button class="ug-btn ug-btn--ghost ug-btn--sm" type="button" style="color:var(--ug-color-accent-text)">Deshacer</button>
+            </div>
+            <footer class="ug-rates">
+              <dl>
+                <div><dt>1 USDT</dt><dd>Bs&nbsp;1.078,00</dd><dd>Binance P2P · hace 3&nbsp;min</dd></div>
+                <div><dt>1 HK$</dt><dd>5,35₴</dd><dd>Mercado · hace 2&nbsp;h</dd></div>
+              </dl>
+              <button class="ug-btn ug-btn--ghost ug-btn--icon" type="button" aria-label="Actualizar tasas"><svg class="ug-icon" aria-hidden="true"><use href="#i-refresh"/></svg></button>
+            </footer>
+          </div>
+        </div>
+
+        <!-- Tasa vieja -->
+        <div class="m-popup-frame">
+          <div class="ug-popup">
+            <div class="ug-notice ug-notice--warning">
+              <svg class="ug-icon" aria-hidden="true"><use href="#i-offline"/></svg>
+              <div class="ug-notice__body">
+                <p>No se pudo actualizar la tasa de Binance.</p>
+                <p>Se usa la de hace 3&nbsp;h.</p>
+              </div>
+              <button class="ug-btn ug-btn--secondary ug-btn--sm" type="button">Reintentar</button>
+            </div>
+            <section class="ug-surface ug-section">
+              <p class="ug-balance ug-balance--ok"><svg class="ug-icon ug-icon--regular" aria-hidden="true"><use href="#i-check-circle"/></svg><span>Te alcanza. Sobran <b class="ug-num">261₴</b></span></p>
+            </section>
+            <footer class="ug-rates">
+              <dl>
+                <div><dt>1 USDT</dt><dd>Bs&nbsp;1.071,40</dd><dd class="ug-stale">Binance P2P · hace 3&nbsp;h</dd></div>
+                <div><dt>1 HK$</dt><dd>5,35₴</dd><dd>Mercado · hace 2&nbsp;h</dd></div>
+              </dl>
+              <button class="ug-btn ug-btn--ghost ug-btn--icon" type="button" aria-label="Actualizar tasas"><svg class="ug-icon" aria-hidden="true"><use href="#i-refresh"/></svg></button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <section class="m-section" id="ajustes">
+    <h2>Ajustes</h2>
+    <p class="m-lead">Grupos con título, una fila por ajuste y los interruptores describen qué pasa encendidos. Se guarda al cambiar; no hay botón de guardar.</p>
+
+    <form class="ug-settings" onsubmit="return false">
+      <section class="ug-surface ug-settings__group" aria-labelledby="g-tienda">
+        <h2 id="g-tienda">Tienda</h2>
+        <label class="ug-switch-row ug-settings__row">
+          <span class="ug-switch-row__text">
+            <span class="ug-label" id="s-cc">Mostrar la tienda en ₴</span>
+            <span class="ug-help" id="s-cc-help">Añade <code>?cc=ua</code> a las direcciones de la tienda para que Steam enseñe los precios de Ucrania sin iniciar sesión.</span>
+          </span>
+          <input class="ug-switch" type="checkbox" role="switch" name="tiendaEnUah" aria-labelledby="s-cc" aria-describedby="s-cc-help" checked>
+        </label>
+        <label class="ug-switch-row ug-settings__row">
+          <span class="ug-switch-row__text">
+            <span class="ug-label" id="s-tags">Mostrar etiquetas en búsquedas y listas</span>
+            <span class="ug-help" id="s-tags-help">Bs y HK$ al lado de cada precio.</span>
+          </span>
+          <input class="ug-switch" type="checkbox" role="switch" name="etiquetas" aria-labelledby="s-tags" aria-describedby="s-tags-help" checked>
+        </label>
+        <label class="ug-switch-row ug-settings__row">
+          <span class="ug-switch-row__text">
+            <span class="ug-label" id="s-reg">Comparar regiones en la ficha del juego</span>
+            <span class="ug-help" id="s-reg-help">Añade a la tarjeta de precio una tabla plegada con el precio en otras regiones.</span>
+          </span>
+          <input class="ug-switch" type="checkbox" role="switch" name="comparacion" aria-labelledby="s-reg" aria-describedby="s-reg-help" checked>
+        </label>
+        <label class="ug-switch-row ug-settings__row">
+          <span class="ug-switch-row__text">
+            <span class="ug-label" id="s-cards">Sugerir tarjetas</span>
+            <span class="ug-help" id="s-cards-help">Propone qué tarjetas de Hong Kong comprar para cubrir el precio.</span>
+          </span>
+          <input class="ug-switch" type="checkbox" role="switch" name="sugerirTarjetas" aria-labelledby="s-cards" aria-describedby="s-cards-help">
+        </label>
+      </section>
+
+      <section class="ug-surface ug-settings__group" aria-labelledby="g-tasas">
+        <h2 id="g-tasas">Binance P2P</h2>
+        <fieldset class="ug-settings__row ug-settings__row--field" style="border:0">
+          <legend class="ug-label" style="padding:0;margin-block-end:var(--ug-space-2)">Precio que se usa</legend>
+          <div class="ug-segmented">
+            <label><input type="radio" name="lado" value="BUY" checked>Comprar USDT</label>
+            <label><input type="radio" name="lado" value="SELL">Vender USDT</label>
+          </div>
+        </fieldset>
+        <div class="ug-settings__row ug-settings__row--field ug-field">
+          <label class="ug-label" for="anuncios">Anuncios que se promedian</label>
+          <p class="ug-help" id="anuncios-help">Entre 1 y 20. Más anuncios dan una tasa más estable.</p>
+          <div class="ug-input-wrap ug-input--narrow"><input class="ug-input" id="anuncios" name="anuncios" type="number" min="1" max="20" value="5" aria-describedby="anuncios-help"></div>
+        </div>
+      </section>
+
+      <section class="ug-surface ug-settings__group" aria-labelledby="g-regiones">
+        <h2 id="g-regiones">Regiones a comparar</h2>
+        <div class="ug-settings__row ug-settings__row--field">
+          <div class="ug-check-chips" role="group" aria-labelledby="g-regiones">
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Estados Unidos</label>
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Hong Kong</label>
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Argentina</label>
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Turquía</label>
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Kazajistán</label>
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Rusia</label>
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Brasil</label>
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Alemania</label>
+            <label class="ug-check-chip"><input type="checkbox" checked><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>Polonia</label>
+            <label class="ug-check-chip"><input type="checkbox"><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>India</label>
+            <label class="ug-check-chip"><input type="checkbox"><svg class="ug-icon" aria-hidden="true"><use href="#i-check"/></svg>China</label>
+          </div>
+        </div>
+      </section>
+    </form>
+  </section>
+</main>
+
+<script>
+  // Rampas: se pintan leyendo los tokens, así la muestra no se desincroniza.
+  const ramps = {
+    neutral: [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12],
+    accent: [3, 4, 7, 9, 10, 11],
+    danger: [3, 7, 11],
+    warning: [3, 7, 11],
+    success: [3, 7, 11],
+  }
+  const root = getComputedStyle(document.documentElement)
+  const host = document.getElementById('ramps')
+  for (const [name, steps] of Object.entries(ramps)) {
+    const row = document.createElement('div')
+    row.className = 'm-ramp'
+    row.innerHTML = `<span class="m-ramp__name">${name}</span>`
+    for (let i = 1; i <= 12; i++) {
+      const cell = document.createElement('div')
+      const chip = document.createElement('div')
+      chip.className = 'm-swatch__chip'
+      cell.append(chip)
+      if (steps.includes(i)) {
+        const v = root.getPropertyValue(`--ug-${name}-${i}`).trim()
+        cell.className = 'm-swatch'
+        chip.style.background = `var(--ug-${name}-${i})`
+        cell.append(`L ${parseFloat(v.slice(6))}`)
+        cell.title = `--ug-${name}-${i}: ${v}`
+      } else {
+        cell.className = 'm-swatch m-swatch--empty'
+      }
+      row.append(cell)
+    }
+    host.append(row)
+  }
+
+  // Interruptor «Lista UG».
+  for (const btn of document.querySelectorAll('[data-toggle-list]')) {
+    btn.addEventListener('click', () => {
+      btn.setAttribute('aria-pressed', String(btn.getAttribute('aria-pressed') !== 'true'))
+    })
+  }
+
+  // Copiar resumen.
+  const copy = document.querySelector('[data-copy]')
+  const copyLabel = copy.querySelector('[data-copy-label]')
+  const copyStatus = document.querySelector('[data-copy-status]')
+  let copyTimer
+  copy.addEventListener('click', async () => {
+    const text = 'ELDEN RING 1 799₴ + Portal 2 240₴ = 2 039₴ ≈ HK$ 381 ≈ 50,5 USDT ≈ Bs 54.423'
+    try { await navigator.clipboard.writeText(text) } catch {}
+    copy.dataset.state = 'on'
+    copyLabel.textContent = 'Copiado'
+    copyStatus.textContent = 'Resumen copiado'
+    clearTimeout(copyTimer)
+    copyTimer = setTimeout(() => {
+      copy.dataset.state = 'off'
+      copyLabel.textContent = 'Copiar resumen'
+      copyStatus.textContent = ''
+    }, 2000)
+  })
+
+  // Tooltip en vivo de la primera etiqueta.
+  const tip = document.getElementById('tip-live')
+  const chip = document.querySelector('[data-tip-chip]')
+  const row = document.querySelector('[data-tip-row]')
+  const show = () => { if (!tip.matches(':popover-open')) tip.showPopover() }
+  const hide = () => { if (tip.matches(':popover-open')) tip.hidePopover() }
+  chip.addEventListener('mouseenter', show)
+  chip.addEventListener('mouseleave', hide)
+  row.addEventListener('focus', () => { if (row.matches(':focus-visible')) show() })
+  row.addEventListener('blur', hide)
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide() })
+</script>
+</body>
+</html>

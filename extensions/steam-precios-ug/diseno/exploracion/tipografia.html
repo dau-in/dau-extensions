@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam Precios UG · Direcciones tipográficas</title>
+<link rel="stylesheet" href="ui/tokens.css">
+<link rel="stylesheet" href="ui/componentes.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wdth,wght@75..100,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600;700&family=Manrope:wght@400..800&family=Space+Grotesk:wght@400..700&family=Unbounded:wght@400..800&display=swap">
+<style>
+  /* Página de comparación tipográfica. Nada de esto está en ui/ todavía. */
+  body { margin: 0; background: oklch(0.17 0.008 75); }
+  .m-wrap { display: grid; gap: 56px; max-width: 1180px; margin: 0 auto; padding: 40px 24px 96px; }
+  .m-intro { display: grid; gap: 8px; max-width: 74ch; }
+  .m-intro h1 { font-size: var(--ug-text-title); line-height: var(--ug-leading-title); letter-spacing: var(--ug-tracking-title); font-weight: 600; }
+  .m-intro p { color: var(--ug-color-text-secondary); text-wrap: pretty; }
+  .m-panel { display: grid; gap: 14px; }
+  .m-panel > header { display: grid; gap: 6px; max-width: 80ch; }
+  .m-panel h2 { display: flex; align-items: baseline; gap: 10px; font-family: system-ui, sans-serif; font-size: 1.125rem; line-height: 1.3; font-weight: 600; }
+  .m-panel h2 .m-n { color: var(--ug-color-text-secondary); font-weight: 400; font-variant-numeric: tabular-nums; }
+  .m-panel p { color: var(--ug-color-text-secondary); font-family: system-ui, sans-serif; font-size: 0.8125rem; line-height: 1.5; text-wrap: pretty; }
+  .m-fonts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .m-font { padding: 2px 8px; border-radius: 4px; background: oklch(0.24 0.012 75); color: var(--ug-color-text-primary); font-family: system-ui, sans-serif; font-size: 0.75rem; }
+  .m-row { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+  @media (max-width: 1000px) { .m-row { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Maqueta de Steam */
+  .steam { display: grid; gap: 14px; padding: 20px; border-radius: 8px; background: #1b2838; color: #c6d4df; font: 13px/1.4 "Motiva Sans", Arial, Helvetica, sans-serif; }
+  .steam-purchase { position: relative; padding: 14px 16px 22px; border-radius: 4px; background: linear-gradient(-60deg, rgba(226,244,255,.3) 5%, rgba(84,107,115,.3) 95%); }
+  .steam-purchase .t { color: #fff; font-size: 19px; }
+  .steam-purchase .act { position: absolute; inset-inline-end: 16px; inset-block-end: -14px; display: flex; align-items: center; padding: 2px; background: #000; border-radius: 2px; }
+  .steam-purchase .act span:first-child { padding: 0 12px; color: #fff; font-size: 14px; }
+  .steam-purchase .act span:last-child { padding: 0 14px; line-height: 28px; border-radius: 2px; color: #d2efa9; font-size: 14px; background: linear-gradient(to right, #75b022 5%, #588a1b 95%); }
+  .steam-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 4px; background: rgba(0,0,0,.2); }
+  .steam-row img { display: block; width: 92px; height: 35px; object-fit: cover; }
+  .steam-row .title { color: #c7d5e0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .steam-row .price { color: #fff; font-size: 12px; }
+  .m-popup-frame { width: max-content; border-radius: var(--ug-radius-lg); box-shadow: var(--ug-shadow-raised); overflow: hidden; }
+
+  /* ---- Base común: superficies cálidas + franja de la bandera ---------- */
+  .d {
+    --ug-neutral-1: oklch(0.17 0.008 75);
+    --ug-neutral-2: oklch(0.205 0.01 75);
+    --ug-neutral-3: oklch(0.24 0.012 75);
+    --ug-neutral-4: oklch(0.275 0.013 75);
+    --ug-neutral-5: oklch(0.305 0.014 75);
+    --ug-neutral-6: oklch(0.37 0.014 75);
+    --ug-neutral-7: oklch(0.455 0.014 75);
+    --ug-neutral-8: oklch(0.53 0.013 75);
+    --ug-neutral-9: oklch(0.6 0.012 75);
+    --ug-neutral-11: oklch(0.83 0.01 75);
+    --ug-neutral-12: oklch(0.95 0.005 75);
+    --ug-color-bg-page: var(--ug-neutral-1);
+    --ug-color-bg-surface: var(--ug-neutral-2);
+    --ug-color-bg-raised: var(--ug-neutral-3);
+    --ug-color-bg-sunken: var(--ug-neutral-1);
+    --ug-color-bg-component: var(--ug-neutral-3);
+    --ug-color-bg-component-hover: var(--ug-neutral-4);
+    --ug-color-bg-component-active: var(--ug-neutral-5);
+    --ug-color-text-primary: var(--ug-neutral-12);
+    --ug-color-text-secondary: var(--ug-neutral-11);
+    --ug-color-text-disabled: var(--ug-neutral-9);
+    --ug-color-text-on-accent: var(--ug-neutral-1);
+    --ug-color-separator: var(--ug-neutral-6);
+    --ug-color-border: var(--ug-neutral-7);
+    --ug-color-border-strong: var(--ug-neutral-8);
+    --d-blue: oklch(0.473 0.168 257);
+    --d-yellow: var(--ug-accent-9);
+    font-family: var(--ug-font-sans);
+  }
+  .d .ug-card,
+  .d .ug-popup {
+    background-image: linear-gradient(to bottom, var(--d-blue) 0 2px, var(--d-yellow) 2px 4px, transparent 4px);
+    background-repeat: no-repeat;
+    padding-block-start: calc(var(--ug-space-3) + 4px);
+  }
+  .d :is(.ug-figure dd, .ug-total__amount, .ug-card__source strong, .ug-chip > span:not(.ug-mark)) {
+    font-family: var(--d-num, inherit);
+  }
+  .d .ug-mark { font-family: var(--d-mark, var(--ug-font-sans)); }
+  .d :is(.ug-figure dt, .ug-section__title) { font-family: var(--d-label, inherit); }
+  /* En el popup las cifras van en filas, como un recibo: las fuentes anchas no caben en una línea. */
+  .d .ug-section { container: ug-card / inline-size; }
+  .d .ug-popup__head h3 { font-family: var(--d-display, inherit); font-size: var(--ug-text-heading); line-height: var(--ug-leading-heading); font-weight: 600; }
+
+  /* ---- 0 · Referencia: Segoe UI ------------------------------------------ */
+  /* Sin cambios tipográficos. */
+
+  /* ---- 1 · Terminal: Space Grotesk + JetBrains Mono ---------------------- */
+  .d-terminal {
+    --ug-font-sans: "Space Grotesk", system-ui, sans-serif;
+    --d-num: "JetBrains Mono", ui-monospace, monospace;
+    --d-mark: "JetBrains Mono", ui-monospace, monospace;
+    --d-label: "JetBrains Mono", ui-monospace, monospace;
+    --ug-radius-lg: 6px;
+    --ug-radius-md: 4px;
+    --ug-radius-sm: 2px;
+  }
+  .d-terminal :is(.ug-figure dt, .ug-section__title) { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.75rem; }
+  .d-terminal .ug-figure dd { font-weight: 600; letter-spacing: -0.03em; }
+  .d-terminal .ug-total__amount { font-weight: 700; letter-spacing: -0.04em; }
+  .d-terminal .ug-mark { font-weight: 700; letter-spacing: 0; }
+  .d-terminal .ug-btn { font-family: "JetBrains Mono", monospace; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; font-weight: 700; }
+  .d-terminal .ug-card__source strong { font-weight: 700; }
+  .d-terminal .ug-popup__head h3 { font-weight: 700; }
+
+  /* ---- 2 · Editorial: Instrument Sans + Instrument Serif ---------------- */
+  .d-editorial {
+    --ug-font-sans: "Instrument Sans", system-ui, sans-serif;
+    --d-num: "Instrument Serif", Georgia, serif;
+    --d-mark: "Instrument Serif", Georgia, serif;
+    --d-display: "Instrument Serif", Georgia, serif;
+    --ug-radius-lg: 12px;
+  }
+  .d-editorial .ug-figure dd { font-size: 1.75rem; line-height: 1.05; font-weight: 400; letter-spacing: -0.01em; }
+  .d-editorial .ug-figure dd small { font-family: var(--ug-font-sans); }
+  .d-editorial .ug-figure + .ug-figure::before { font-family: "Instrument Serif", serif; font-style: italic; font-size: 1.5rem; }
+  .d-editorial .ug-figures--compact .ug-figure dd { font-size: 1.375rem; }
+  .d-editorial .ug-total__amount { font-size: 2.5rem; line-height: 1; font-weight: 400; letter-spacing: -0.02em; }
+  .d-editorial .ug-card__source strong { font-size: 1.25rem; font-weight: 400; }
+  .d-editorial .ug-chip > span:not(.ug-mark) { font-size: 0.9375rem; font-weight: 400; }
+  .d-editorial .ug-mark { font-style: italic; font-size: 0.875rem; font-weight: 400; letter-spacing: 0; }
+  .d-editorial .ug-popup__head h3 { font-size: 1.375rem; font-weight: 400; }
+  .d-editorial :is(.ug-btn, .ug-disclosure > summary) { border-radius: 999px; }
+
+  /* ---- 3 · Póster: Unbounded + Manrope ---------------------------------- */
+  .d-poster {
+    --ug-font-sans: "Manrope", system-ui, sans-serif;
+    --d-mark: "Unbounded", system-ui, sans-serif;
+    --d-display: "Unbounded", system-ui, sans-serif;
+    --ug-radius-lg: 14px;
+  }
+  .d-poster :is(.ug-figure dt, .ug-section__title) { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; font-weight: 700; }
+  .d-poster .ug-figure dd { font-size: 1.375rem; font-weight: 800; letter-spacing: -0.02em; }
+  .d-poster .ug-card__source strong,
+  .d-poster .ug-total__amount { font-family: "Unbounded", sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+  .d-poster .ug-total__amount { font-size: 1.75rem; }
+  .d-poster .ug-mark { font-weight: 800; letter-spacing: 0; padding-inline: 6px; border-radius: 999px; }
+  .d-poster .ug-chip .ug-mark { border-radius: 999px; }
+  .d-poster .ug-btn { font-weight: 800; }
+  .d-poster :is(.ug-btn, .ug-disclosure > summary, .ug-chip, .ug-badge) { border-radius: 999px; }
+  .d-poster .ug-chip { padding-inline: 4px 10px; }
+  .d-poster .ug-chip > span:not(.ug-mark) { font-weight: 800; }
+
+  /* ---- 4 · Grotesca expresiva: Bricolage Grotesque ---------------------- */
+  .d-bricolage {
+    --ug-font-sans: "Bricolage Grotesque", system-ui, sans-serif;
+    --ug-radius-lg: 12px;
+  }
+  .d-bricolage .ug-figure dd { font-size: 1.5rem; font-weight: 700; font-stretch: 85%; letter-spacing: -0.02em; }
+  .d-bricolage .ug-figures--compact .ug-figure dd { font-size: 1.25rem; }
+  .d-bricolage .ug-total__amount { font-size: 2rem; font-weight: 800; font-stretch: 80%; letter-spacing: -0.03em; }
+  .d-bricolage .ug-card__source strong { font-size: 1.125rem; font-weight: 800; font-stretch: 85%; }
+  .d-bricolage .ug-mark { font-weight: 800; font-stretch: 75%; font-size: 0.75rem; }
+  .d-bricolage .ug-popup__head h3 { font-weight: 800; font-size: 1.125rem; }
+  .d-bricolage .ug-btn { font-weight: 700; }
+  .d-bricolage :is(.ug-btn, .ug-disclosure > summary, .ug-chip) { border-radius: 999px; }
+  .d-bricolage .ug-chip { padding-inline: 4px 10px; }
+  .d-bricolage .ug-chip .ug-mark { border-radius: 999px; }
+
+  /* ---- 5 · Ancha: Archivo con eje de anchura ---------------------------- */
+  .d-archivo {
+    --ug-font-sans: "Archivo", system-ui, sans-serif;
+    --ug-radius-lg: 8px;
+  }
+  .d-archivo :is(.ug-figure dd, .ug-total__amount, .ug-card__source strong, .ug-mark, .ug-popup__head h3) { font-stretch: 125%; font-weight: 700; }
+  .d-archivo .ug-figure dd { letter-spacing: -0.02em; }
+  .d-archivo .ug-total__amount { font-size: 1.75rem; letter-spacing: -0.03em; }
+  .d-archivo :is(.ug-figure dt, .ug-section__title) { text-transform: uppercase; font-stretch: 112%; letter-spacing: 0.05em; font-size: 0.75rem; font-weight: 600; }
+  .d-archivo .ug-btn { font-stretch: 112%; font-weight: 700; }
+</style>
+</head>
+<body class="ug-root">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect vector-effect="non-scaling-stroke" x="9" y="9" width="12" height="12" rx="2"/><path vector-effect="non-scaling-stroke" d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M20 7h-9M14 17H4M17 4v6M7 14v6M4 7h5M20 17h-3"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle vector-effect="non-scaling-stroke" cx="12" cy="12" r="9"/><path vector-effect="non-scaling-stroke" d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  </defs>
+</svg>
+
+<main class="m-wrap">
+  <header class="m-intro">
+    <h1>Direcciones tipográficas</h1>
+    <p>Cada dirección es un par de fuentes con su propio tratamiento de cifras, etiquetas, marca y botones. Todas usan la misma base (superficies cálidas y franja de la bandera), para que solo cambie la tipografía. Todas las fuentes son libres (OFL) y se incluirían dentro de la extensión; aquí se cargan desde Google Fonts para la muestra.</p>
+  </header>
+
+  <section class="m-panel">
+    <header>
+      <h2><span class="m-n">0</span> Referencia: fuente del sistema</h2>
+      <p>Lo que hay ahora. Correcto, pero neutro: es la fuente de Windows y se parece a todo.</p>
+      <div class="m-fonts"><span class="m-font">Segoe UI</span></div>
+    </header>
+    <div class="m-row d" data-set></div>
+  </section>
+
+  <section class="m-panel">
+    <header>
+      <h2><span class="m-n">1</span> Terminal</h2>
+      <p>Aire de exchange y de cripto, que encaja con USDT y Binance. Las cifras van en monoespaciada, y las etiquetas y botones en mayúsculas de máquina de escribir. Las esquinas son casi rectas, pero más limpias que las de Steam.</p>
+      <div class="m-fonts"><span class="m-font">Space Grotesk · interfaz</span><span class="m-font">JetBrains Mono · cifras, etiquetas, botones</span></div>
+    </header>
+    <div class="m-row d d-terminal" data-set></div>
+  </section>
+
+  <section class="m-panel">
+    <header>
+      <h2><span class="m-n">2</span> Editorial</h2>
+      <p>Cifras grandes en serifa, como en una revista o un ticket elegante. Es lo más opuesto a Steam: nadie la confunde con la tienda. La serifa solo va en números y títulos; el resto es una sans de la misma familia.</p>
+      <div class="m-fonts"><span class="m-font">Instrument Sans · interfaz</span><span class="m-font">Instrument Serif · cifras, marca, títulos</span></div>
+    </header>
+    <div class="m-row d d-editorial" data-set></div>
+  </section>
+
+  <section class="m-panel">
+    <header>
+      <h2><span class="m-n">3</span> Póster</h2>
+      <p>Una display ancha y redonda para la marca, el precio de origen y el total, con una sans geométrica muy negra para las cifras. Es lo más llamativo y lo más «de grupo», casi de marca deportiva.</p>
+      <div class="m-fonts"><span class="m-font">Unbounded · marca, precio, total</span><span class="m-font">Manrope · interfaz y cifras</span></div>
+    </header>
+    <div class="m-row d d-poster" data-set></div>
+  </section>
+
+  <section class="m-panel">
+    <header>
+      <h2><span class="m-n">4</span> Grotesca expresiva</h2>
+      <p>Una sola familia con mucha personalidad en los pesos altos. Las cifras van condensadas y negras, y el texto pequeño sigue siendo muy legible. Es la opción con más carácter y sin mezclar fuentes.</p>
+      <div class="m-fonts"><span class="m-font">Bricolage Grotesque · todo</span></div>
+    </header>
+    <div class="m-row d d-bricolage" data-set></div>
+  </section>
+
+  <section class="m-panel">
+    <header>
+      <h2><span class="m-n">5</span> Ancha</h2>
+      <p>Una sola familia con eje de anchura: cifras y marca extendidas, y etiquetas en mayúsculas semianchas. Tiene un aire técnico y deportivo, y es más sobria que el póster.</p>
+      <div class="m-fonts"><span class="m-font">Archivo · todo, a varias anchuras</span></div>
+    </header>
+    <div class="m-row d d-archivo" data-set></div>
+  </section>
+</main>
+
+<template id="t-set">
+  <div class="steam">
+    <div class="steam-purchase">
+      <div class="t">Comprar ELDEN RING</div>
+      <div class="act"><span>1&nbsp;799₴</span><span>Añadir al carro</span></div>
+    </div>
+    <div class="ug-surface ug-card" role="group" aria-label="Precio UG de ELDEN RING" style="margin-block-start:12px">
+      <div class="ug-card__head">
+        <span class="ug-mark" aria-hidden="true">UG</span>
+        <p class="ug-card__source"><strong class="ug-num">1&nbsp;799₴</strong> en Steam Ucrania</p>
+        <button class="ug-btn ug-btn--accent" type="button" aria-pressed="false" aria-label="Lista UG: ELDEN RING" data-toggle-list>
+          <span class="ug-swap" aria-hidden="true"><svg class="ug-icon" data-when="off"><use href="#i-plus"/></svg><svg class="ug-icon" data-when="on"><use href="#i-check"/></svg></span>
+          Lista UG
+        </button>
+      </div>
+      <dl class="ug-figures">
+        <div class="ug-figure"><dt>Tarjeta de Hong Kong</dt><dd>HK$&nbsp;336.45</dd></div>
+        <div class="ug-figure"><dt>En Binance</dt><dd>44,54 <small>USDT</small></dd></div>
+        <div class="ug-figure"><dt>En bolívares</dt><dd>Bs&nbsp;48.016,87</dd></div>
+      </dl>
+      <details class="ug-disclosure">
+        <summary>
+          <svg class="ug-icon ug-disclosure__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+          Comparar regiones
+          <span class="ug-disclosure__hint ug-disclosure__hint--success"><svg class="ug-icon ug-icon--regular" aria-hidden="true"><use href="#i-check-circle"/></svg>La más barata de 9 regiones</span>
+        </summary>
+        <div class="ug-disclosure__panel"><p class="ug-table__foot">(Tabla de regiones.)</p></div>
+      </details>
+    </div>
+    <div class="steam-row">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/620/capsule_sm_120.jpg" alt="">
+      <div class="title">Portal 2</div>
+      <div class="price">240,00₴</div>
+      <span class="ug-chip"><span class="ug-mark" aria-hidden="true">UG</span><span>Bs&nbsp;6.406</span><span class="ug-chip__sep" aria-hidden="true">·</span><span class="ug-chip__muted">HK$&nbsp;44.88</span></span>
+    </div>
+  </div>
+  <div class="m-popup-frame">
+    <div class="ug-popup">
+      <header class="ug-popup__head">
+        <span class="ug-mark" aria-hidden="true">UG</span>
+        <h3>Lista UG</h3>
+        <span class="ug-badge">2 juegos</span>
+        <button class="ug-btn ug-btn--ghost ug-btn--icon" type="button" aria-label="Abrir los ajustes"><svg class="ug-icon" aria-hidden="true"><use href="#i-sliders"/></svg></button>
+      </header>
+      <div class="ug-surface ug-section">
+        <div class="ug-total">
+          <span class="ug-section__title">Total</span>
+          <p class="ug-total__amount">2&nbsp;039₴</p>
+        </div>
+        <dl class="ug-figures ug-figures--compact">
+          <div class="ug-figure"><dt>Tarjeta HK</dt><dd>HK$&nbsp;381.33</dd></div>
+          <div class="ug-figure"><dt>Binance</dt><dd>50,48 <small>USDT</small></dd></div>
+          <div class="ug-figure"><dt>Bolívares</dt><dd>Bs&nbsp;54.422,67</dd></div>
+        </dl>
+        <button class="ug-btn ug-btn--accent ug-btn--lg ug-btn--block" type="button">
+          <svg class="ug-icon" aria-hidden="true"><use href="#i-copy"/></svg>
+          Copiar resumen
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  const tpl = document.getElementById('t-set')
+  for (const el of document.querySelectorAll('[data-set]')) el.append(tpl.content.cloneNode(true))
+  for (const btn of document.querySelectorAll('[data-toggle-list]')) {
+    btn.addEventListener('click', () => btn.setAttribute('aria-pressed', String(btn.getAttribute('aria-pressed') !== 'true')))
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam Precios UG · Variantes para diferenciarla</title>
+<link rel="stylesheet" href="ui/tokens.css">
+<link rel="stylesheet" href="ui/componentes.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  /* Página de comparación. Cada .v-* cambia una sola cosa sobre el diseño
+     actual; las combinadas suman varias. Nada de esto está en ui/ todavía. */
+  body { margin: 0; background: var(--ug-color-bg-page); }
+  .m-wrap { display: grid; gap: 40px; max-width: 1180px; margin: 0 auto; padding: 40px 24px 96px; }
+  .m-intro { display: grid; gap: 8px; max-width: 72ch; }
+  .m-intro h1 { font-size: var(--ug-text-title); line-height: var(--ug-leading-title); letter-spacing: var(--ug-tracking-title); font-weight: 600; }
+  .m-intro p { color: var(--ug-color-text-secondary); text-wrap: pretty; }
+  .m-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 540px), 1fr)); align-items: start; }
+  .m-panel { display: grid; gap: 10px; align-content: start; }
+  .m-panel h2 { display: flex; align-items: baseline; gap: 10px; font-size: var(--ug-text-heading); line-height: var(--ug-leading-heading); font-weight: 600; }
+  .m-panel h2 .m-n { color: var(--ug-color-text-secondary); font-variant-numeric: tabular-nums; font-weight: 400; }
+  .m-panel p { color: var(--ug-color-text-secondary); font-size: var(--ug-text-label); line-height: 1.45; text-wrap: pretty; }
+  .m-panel--wide { grid-column: 1 / -1; }
+
+  /* Maqueta de Steam */
+  .steam { display: grid; gap: 16px; padding: 20px; border-radius: 8px; background: #1b2838; color: #c6d4df; font: 13px/1.4 "Motiva Sans", Arial, Helvetica, sans-serif; }
+  .steam-purchase { padding: 14px 16px 22px; border-radius: 4px; background: linear-gradient(-60deg, rgba(226,244,255,.3) 5%, rgba(84,107,115,.3) 95%); position: relative; }
+  .steam-purchase .t { color: #fff; font-size: 19px; }
+  .steam-purchase .act { position: absolute; inset-inline-end: 16px; inset-block-end: -14px; display: flex; align-items: center; padding: 2px; background: #000; border-radius: 2px; }
+  .steam-purchase .act span:first-child { padding: 0 12px; color: #fff; font-size: 14px; }
+  .steam-purchase .act span:last-child { padding: 0 14px; line-height: 28px; border-radius: 2px; color: #d2efa9; font-size: 14px; background: linear-gradient(to right, #75b022 5%, #588a1b 95%); }
+  .steam-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 4px; background: rgba(0,0,0,.2); }
+  .steam-row img { display: block; width: 92px; height: 35px; object-fit: cover; }
+  .steam-row .title { color: #c7d5e0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .steam-row .price { color: #fff; font-size: 12px; }
+
+  /* La semántica se vuelve a declarar aquí para que cada panel resuelva sus
+     propios primitivos (si no, heredaría los ya resueltos de :root). */
+  .v {
+    --ug-color-bg-page: var(--ug-neutral-1);
+    --ug-color-bg-surface: var(--ug-neutral-2);
+    --ug-color-bg-raised: var(--ug-neutral-3);
+    --ug-color-bg-sunken: var(--ug-neutral-1);
+    --ug-color-bg-component: var(--ug-neutral-3);
+    --ug-color-bg-component-hover: var(--ug-neutral-4);
+    --ug-color-bg-component-active: var(--ug-neutral-5);
+    --ug-color-text-primary: var(--ug-neutral-12);
+    --ug-color-text-secondary: var(--ug-neutral-11);
+    --ug-color-text-disabled: var(--ug-neutral-9);
+    --ug-color-text-on-accent: var(--ug-neutral-1);
+    --ug-color-separator: var(--ug-neutral-6);
+    --ug-color-border-subtle: var(--ug-neutral-6);
+    --ug-color-border: var(--ug-neutral-7);
+    --ug-color-border-strong: var(--ug-neutral-8);
+    --v-flag-blue: oklch(0.473 0.168 257);
+    --v-flag-yellow: var(--ug-accent-9);
+  }
+  .v .ug-card,
+  .v .ug-popup {
+    background-image: var(--v-bg-stripe, none), var(--v-bg-glow, none);
+    background-repeat: no-repeat;
+  }
+
+  /* 1 · Superficies cálidas: mismo L que el neutro frío, tono 75. */
+  .v-warm {
+    --ug-neutral-1: oklch(0.17 0.008 75);
+    --ug-neutral-2: oklch(0.205 0.01 75);
+    --ug-neutral-3: oklch(0.24 0.012 75);
+    --ug-neutral-4: oklch(0.275 0.013 75);
+    --ug-neutral-5: oklch(0.305 0.014 75);
+    --ug-neutral-6: oklch(0.37 0.014 75);
+    --ug-neutral-7: oklch(0.455 0.014 75);
+    --ug-neutral-8: oklch(0.53 0.013 75);
+    --ug-neutral-9: oklch(0.6 0.012 75);
+    --ug-neutral-11: oklch(0.83 0.01 75);
+    --ug-neutral-12: oklch(0.95 0.005 75);
+  }
+
+  /* 2 · Franja de la bandera: 2px azul sobre 2px amarillo, arriba. */
+  .v-stripe {
+    --v-bg-stripe: linear-gradient(to bottom, var(--v-flag-blue) 0 2px, var(--v-flag-yellow) 2px 4px, transparent 4px);
+  }
+  .v-stripe .ug-card { padding-block-start: calc(var(--ug-space-3) + 4px); }
+  .v-stripe .ug-popup { padding-block-start: calc(var(--ug-space-3) + 4px); }
+
+  /* 3 · Marcas */
+  .v-mark-flag .ug-mark {
+    background: var(--v-flag-blue);
+    color: var(--v-flag-yellow);
+  }
+  .v-mark-square .ug-mark {
+    position: relative;
+    min-width: 0;
+    padding-inline: 18px 0;
+    background: none;
+    color: var(--ug-color-text-primary);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+  .v-mark-square .ug-mark::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 50%;
+    width: 14px;
+    height: 10px;
+    translate: 0 -50%;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, var(--v-flag-blue) 50%, var(--v-flag-yellow) 50%);
+  }
+  .v-mark-square .ug-chip .ug-mark { padding-inline-start: 16px; font-size: 0.6875rem; }
+  .v-mark-square .ug-chip .ug-mark::before { width: 12px; height: 8px; }
+  .v-mark-hryvnia .ug-mark {
+    min-width: 0;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border-radius: 999px;
+    font-size: 0;
+  }
+  .v-mark-hryvnia .ug-mark::after { content: "₴"; font-size: 0.8125rem; font-weight: 700; }
+  .v-mark-hryvnia .ug-chip .ug-mark { width: 18px; height: 18px; }
+  .v-mark-hryvnia .ug-chip .ug-mark::after { font-size: 0.75rem; }
+
+  /* 4 · Brillo de acento en la esquina. */
+  .v-glow {
+    --v-bg-glow: radial-gradient(140% 130% at 100% 0%, oklch(0.87 0.173 94 / 0.1), transparent 55%);
+  }
+
+  /* 5 · Fuente propia en las cifras. */
+  .v-geist { --v-num-font: "Geist Mono", ui-monospace, monospace; }
+  .v-jetbrains { --v-num-font: "JetBrains Mono", ui-monospace, monospace; }
+  .v :is(.ug-figure dd, .ug-card__source strong, .ug-chip > span:not(.ug-mark), .ug-total__amount) {
+    font-family: var(--v-num-font, inherit);
+  }
+  :is(.v-geist, .v-jetbrains) :is(.ug-figure dd, .ug-total__amount) { letter-spacing: -0.02em; }
+
+  /* 6 · Formas redondas. */
+  .v-round { --ug-radius-lg: 14px; }
+  .v-round :is(.ug-btn, .ug-disclosure > summary, .ug-chip, .ug-badge) { border-radius: 999px; }
+  .v-round .ug-chip { padding-inline: 4px 10px; }
+  .v-round .ug-chip .ug-mark { border-radius: 999px; }
+  .v-round .ug-mark { border-radius: 999px; padding-inline: 6px; }
+  .v-round.v-mark-square .ug-mark { padding-inline: 18px 0; }
+  .v-round.v-mark-square .ug-chip .ug-mark { padding-inline: 16px 0; }
+  .v-round .m-popup-frame { border-radius: 16px; }
+  .v-round .ug-section { border-radius: 14px; }
+
+  .m-marks { display: flex; flex-wrap: wrap; gap: 12px; }
+  .m-mark-opt { display: grid; gap: 10px; justify-items: start; padding: 16px; border-radius: 8px; background: #1b2838; min-width: 150px; }
+  .m-mark-opt span.m-caption { color: #c6d4df; font-size: 12px; font-family: Arial, sans-serif; }
+  .m-popups { display: flex; flex-wrap: wrap; gap: 24px; align-items: start; }
+  .m-popup-frame { border-radius: var(--ug-radius-lg); box-shadow: var(--ug-shadow-raised); overflow: hidden; }
+</style>
+</head>
+<body class="ug-root">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect vector-effect="non-scaling-stroke" x="9" y="9" width="12" height="12" rx="2"/><path vector-effect="non-scaling-stroke" d="M5 15H4.5A1.5 1.5 0 0 1 3 13.5v-9A1.5 1.5 0 0 1 4.5 3h9A1.5 1.5 0 0 1 15 4.5V5"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M20 7h-9M14 17H4M17 4v6M7 14v6M4 7h5M20 17h-3"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><circle vector-effect="non-scaling-stroke" cx="12" cy="12" r="9"/><path vector-effect="non-scaling-stroke" d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  </defs>
+</svg>
+
+<main class="m-wrap">
+  <header class="m-intro">
+    <h1>Variantes para diferenciarla de Steam</h1>
+    <p>Cada panel cambia una sola cosa sobre el diseño actual (el 0), con la misma tarjeta y la misma etiqueta de búsqueda sobre una maqueta de Steam. Al final hay dos combinaciones con su popup. Ninguna variante cambia el contraste: el neutro cálido tiene la misma luminosidad que el frío.</p>
+  </header>
+
+  <div class="m-grid">
+    <section class="m-panel">
+      <h2><span class="m-n">0</span> Actual</h2>
+      <p>Neutro frío, marca amarilla y radios de 10 px.</p>
+      <div class="v" data-demo></div>
+    </section>
+
+    <section class="m-panel">
+      <h2><span class="m-n">1</span> Superficies cálidas</h2>
+      <p>Grafito con un toque ámbar (tono 75) en lugar del gris azulado. Es el cambio que más separa la pieza del azul de Steam sin añadir nada.</p>
+      <div class="v v-warm" data-demo></div>
+    </section>
+
+    <section class="m-panel">
+      <h2><span class="m-n">2</span> Franja de la bandera</h2>
+      <p>2 px de azul sobre 2 px de amarillo en el borde superior de la tarjeta y del popup. Es una firma que se reconoce de lejos.</p>
+      <div class="v v-stripe" data-demo></div>
+    </section>
+
+    <section class="m-panel">
+      <h2><span class="m-n">3</span> Brillo de acento</h2>
+      <p>Un reflejo amarillo al 10 % en la esquina superior derecha. Da profundidad y calidez, y es solo decorativo.</p>
+      <div class="v v-glow" data-demo></div>
+    </section>
+
+    <section class="m-panel">
+      <h2><span class="m-n">4</span> Cifras en Geist Mono</h2>
+      <p>Monoespaciada moderna, de aire financiero. Habría que incluirla en la extensión (unos 60 KB en woff2, pesos 400 y 600).</p>
+      <div class="v v-geist" data-demo></div>
+    </section>
+
+    <section class="m-panel">
+      <h2><span class="m-n">5</span> Cifras en JetBrains Mono</h2>
+      <p>Más técnica y con más personalidad; los números son más anchos. El mismo coste que Geist Mono.</p>
+      <div class="v v-jetbrains" data-demo></div>
+    </section>
+
+    <section class="m-panel">
+      <h2><span class="m-n">6</span> Formas redondas</h2>
+      <p>Tarjeta de 14 px y botones, chips e insignias en píldora, frente a las esquinas casi rectas de Steam.</p>
+      <div class="v v-round" data-demo></div>
+    </section>
+
+    <section class="m-panel m-panel--wide">
+      <h2><span class="m-n">7</span> Marca UG</h2>
+      <p>La marca va en cada tarjeta y en cada etiqueta, así que es lo que más se repite en la página.</p>
+      <div class="m-marks">
+        <div class="m-mark-opt v"><span class="ug-chip"><span class="ug-mark">UG</span><span>Bs&nbsp;6.406</span></span><span class="ug-mark">UG</span><span class="m-caption">A · Actual: amarillo</span></div>
+        <div class="m-mark-opt v v-mark-flag"><span class="ug-chip"><span class="ug-mark">UG</span><span>Bs&nbsp;6.406</span></span><span class="ug-mark">UG</span><span class="m-caption">B · Colores de la bandera</span></div>
+        <div class="m-mark-opt v v-mark-square"><span class="ug-chip"><span class="ug-mark">UG</span><span>Bs&nbsp;6.406</span></span><span class="ug-mark">UG</span><span class="m-caption">C · Banderita + UG</span></div>
+        <div class="m-mark-opt v v-mark-hryvnia"><span class="ug-chip"><span class="ug-mark">UG</span><span>Bs&nbsp;6.406</span></span><span class="ug-mark">UG</span><span class="m-caption">D · Sello ₴</span></div>
+      </div>
+    </section>
+
+    <section class="m-panel m-panel--wide">
+      <h2><span class="m-n">8</span> Combinación sobria</h2>
+      <p>1 + 2 + 6 + marca B: superficies cálidas, franja de la bandera, formas redondas y marca con los colores de la bandera.</p>
+      <div class="m-grid">
+        <div class="v v-warm v-stripe v-round v-mark-flag" data-demo></div>
+        <div class="v v-warm v-stripe v-round v-mark-flag" data-popup></div>
+      </div>
+    </section>
+
+    <section class="m-panel m-panel--wide">
+      <h2><span class="m-n">9</span> Combinación con más carácter</h2>
+      <p>1 + 2 + 3 + 4 + 6 + marca C: lo anterior, más el brillo, las cifras en Geist Mono y la banderita como marca.</p>
+      <div class="m-grid">
+        <div class="v v-warm v-stripe v-glow v-geist v-round v-mark-square" data-demo></div>
+        <div class="v v-warm v-stripe v-glow v-geist v-round v-mark-square" data-popup></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<template id="t-demo">
+  <div class="steam">
+    <div class="steam-purchase">
+      <div class="t">Comprar ELDEN RING</div>
+      <div class="act"><span>1&nbsp;799₴</span><span>Añadir al carro</span></div>
+    </div>
+    <div class="ug-surface ug-card" role="group" aria-label="Precio UG de ELDEN RING" style="margin-block-start:12px">
+      <div class="ug-card__head">
+        <span class="ug-mark" aria-hidden="true">UG</span>
+        <p class="ug-card__source"><strong class="ug-num">1&nbsp;799₴</strong> en Steam Ucrania</p>
+        <button class="ug-btn ug-btn--accent" type="button" aria-pressed="false" aria-label="Lista UG: ELDEN RING" data-toggle-list>
+          <span class="ug-swap" aria-hidden="true"><svg class="ug-icon" data-when="off"><use href="#i-plus"/></svg><svg class="ug-icon" data-when="on"><use href="#i-check"/></svg></span>
+          Lista UG
+        </button>
+      </div>
+      <dl class="ug-figures">
+        <div class="ug-figure"><dt>Tarjeta de Hong Kong</dt><dd>HK$&nbsp;336.45</dd></div>
+        <div class="ug-figure"><dt>En Binance</dt><dd>44,54 <small>USDT</small></dd></div>
+        <div class="ug-figure"><dt>En bolívares</dt><dd>Bs&nbsp;48.016,87</dd></div>
+      </dl>
+      <details class="ug-disclosure">
+        <summary>
+          <svg class="ug-icon ug-disclosure__chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+          Comparar regiones
+          <span class="ug-disclosure__hint ug-disclosure__hint--success"><svg class="ug-icon ug-icon--regular" aria-hidden="true"><use href="#i-check-circle"/></svg>La más barata de 9 regiones</span>
+        </summary>
+        <div class="ug-disclosure__panel"><p class="ug-table__foot">(Tabla de regiones.)</p></div>
+      </details>
+    </div>
+    <div class="steam-row">
+      <img src="https://cdn.akamai.steamstatic.com/steam/apps/620/capsule_sm_120.jpg" alt="">
+      <div class="title">Portal 2</div>
+      <div class="price">240,00₴</div>
+      <span class="ug-chip"><span class="ug-mark" aria-hidden="true">UG</span><span>Bs&nbsp;6.406</span><span class="ug-chip__sep" aria-hidden="true">·</span><span class="ug-chip__muted">HK$&nbsp;44.88</span></span>
+    </div>
+  </div>
+</template>
+
+<template id="t-popup">
+  <div class="m-popup-frame" style="width:max-content">
+    <div class="ug-popup">
+      <header class="ug-popup__head">
+        <span class="ug-mark" aria-hidden="true">UG</span>
+        <h3 style="font-size:var(--ug-text-heading);font-weight:600;line-height:var(--ug-leading-heading)">Lista UG</h3>
+        <span class="ug-badge">2 juegos</span>
+        <button class="ug-btn ug-btn--ghost ug-btn--icon" type="button" aria-label="Abrir los ajustes"><svg class="ug-icon" aria-hidden="true"><use href="#i-sliders"/></svg></button>
+      </header>
+      <div class="ug-surface ug-section">
+        <div class="ug-total">
+          <span class="ug-section__title">Total</span>
+          <p class="ug-total__amount">2&nbsp;039₴</p>
+        </div>
+        <dl class="ug-figures ug-figures--compact">
+          <div class="ug-figure"><dt>Tarjeta HK</dt><dd>HK$&nbsp;381.33</dd></div>
+          <div class="ug-figure"><dt>Binance</dt><dd>50,48 <small>USDT</small></dd></div>
+          <div class="ug-figure"><dt>Bolívares</dt><dd>Bs&nbsp;54.422,67</dd></div>
+        </dl>
+        <button class="ug-btn ug-btn--accent ug-btn--lg ug-btn--block" type="button">
+          <svg class="ug-icon" aria-hidden="true"><use href="#i-copy"/></svg>
+          Copiar resumen
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  const demo = document.getElementById('t-demo')
+  const popup = document.getElementById('t-popup')
+  for (const el of document.querySelectorAll('[data-demo]')) el.append(demo.content.cloneNode(true))
+  for (const el of document.querySelectorAll('[data-popup]')) el.append(popup.content.cloneNode(true))
+  for (const btn of document.querySelectorAll('[data-toggle-list]')) {
+    btn.addEventListener('click', () => btn.setAttribute('aria-pressed', String(btn.getAttribute('aria-pressed') !== 'true')))
+  }
+</script>
+</body>
+</html>
