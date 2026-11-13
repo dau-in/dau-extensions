@@ -1,5 +1,5 @@
-// Content script de store.steampowered.com: detecta ediciones y precios,
-// pide los datos al service worker y monta la UI en Shadow DOM.
+// Content script for store.steampowered.com: detects editions and prices,
+// asks the service worker for the data and mounts the UI in Shadow DOM.
 ;(async () => {
   const UG = globalThis.UG
   const { detect, render } = UG
@@ -13,13 +13,13 @@
       r = await chrome.runtime.sendMessage({ type, ...payload })
     } catch {
       alive = false
-      throw new Error('La extensión se actualizó. Recarga la página.')
+      throw new Error('The extension was updated. Reload the page.')
     }
     if (!r?.ok) throw Object.assign(new Error(r?.error ?? 'Error'), { source: r?.source })
     return r.data
   }
 
-  // ---- Fuente y estilos --------------------------------------------------------
+  // ---- Font and styles --------------------------------------------------------
 
   const LATIN = 'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD'
   const LATIN_EXT = 'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF'
@@ -40,8 +40,8 @@
   let ratesState = null
   let ratesLoading = null
 
-  // again: volver a preguntar al service worker, que usa su caché si sigue valiendo.
-  // force: saltarse la caché y pedir las tasas a la red.
+  // again: ask the service worker again; it uses its cache while still valid.
+  // force: skip the cache and fetch the rates from the network.
   function loadRates({ force = false, again = false } = {}) {
     if (force || again || !ratesLoading) ratesLoading = send('rates:get', { force }).then((r) => (ratesState = r))
     return ratesLoading
@@ -57,7 +57,7 @@
 
   const inList = (key) => list.some((i) => i.key === key)
 
-  // ---- Tickets de la ficha ---------------------------------------------------------
+  // ---- Tickets on the game page ---------------------------------------------------
 
   const page = detect.pageInfo(location.href)
   const tickets = []
@@ -66,6 +66,7 @@
     const key = `${t.item.type}:${t.item.id}`
     return {
       item: t.item,
+      position: { index: tickets.indexOf(t) + 1, total: tickets.length },
       status: t.status,
       price: t.price,
       ratesState,
@@ -81,7 +82,7 @@
             })
           button.setAttribute('aria-pressed', String(inList(key)))
         } catch {
-          // Si la extensión se recargó, el botón queda como estaba.
+          // If the extension was reloaded, the button stays as it was.
         } finally {
           button.disabled = false
           button.focus()
@@ -149,7 +150,7 @@
         price: null,
       })
     }
-    // Ficha sin ediciones comprables: gratis, no disponible o próximamente.
+    // Game page without purchasable editions: free, unavailable or coming soon.
     if (!blocks.length && page.kind === 'app') {
       const area = document.querySelector('#game_area_purchase, .game_area_purchase')
       const before = document.querySelector('#game_area_description')
@@ -166,7 +167,7 @@
     if (tickets.length) loadTicketPrices(tickets)
   }
 
-  // ---- Talones de las listas -----------------------------------------------------------
+  // ---- Stubs in lists --------------------------------------------------------------------
 
   const stubs = []
 
@@ -201,15 +202,15 @@
     for (const f of found) {
       f.el.setAttribute(detect.DONE_ATTR, '')
       const { host, root } = mount((h) => (f.place === 'append' ? f.anchor.append(h) : f.anchor.after(h)))
-      // Alineado a la derecha: en la búsqueda la columna de precio mide ~34 px
-      // y el talón tiene que crecer hacia la izquierda, no salirse de la fila.
+      // Right-aligned: in search results the price column is ~34 px wide, so the
+      // stub has to grow to the left instead of overflowing the row.
       host.style.cssText = 'display:flex;justify-content:flex-end;margin-top:4px;line-height:0'
       const s = { host, root, el: f.el, title: f.title, type: f.type, id: f.id, status: 'loading', uah: null, tip: null, listeners: new AbortController() }
       if (f.pagePrice) {
         s.status = 'priced'
         s.uah = f.pagePrice.final / 100
       }
-      // Teclado: enfocar la fila muestra el detalle.
+      // Keyboard: focusing the row shows the details.
       const { signal } = s.listeners
       f.el.addEventListener('focusin', () => f.el.matches(':focus-visible') && showTip(s), { signal })
       f.el.addEventListener('focusout', () => hideTip(s), { signal })
@@ -243,7 +244,7 @@
     stubs.length = 0
   }
 
-  // ---- Arranque y cambios ----------------------------------------------------------------
+  // ---- Start-up and changes --------------------------------------------------------------
 
   function renderAll() {
     for (const t of tickets) if (t.status !== 'loading') renderTicket(t)

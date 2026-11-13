@@ -1,5 +1,5 @@
-// Construye el ticket de la ficha y el talón de las listas. Todo el texto que
-// viene de la página entra con textContent, nunca como HTML.
+// Builds the ticket on the game page and the stub in lists. Every piece of
+// text that comes from the page goes in with textContent, never as HTML.
 ;(() => {
   const UG = (globalThis.UG ??= {})
   const { calc, icons, config } = UG
@@ -22,7 +22,7 @@
     return el
   }
 
-  // Marcado fijo de la extensión (SVG), nunca datos de la página.
+  // The extension's own fixed markup (SVG), never page data.
   function svg(markup) {
     const t = document.createElement('template')
     t.innerHTML = markup.trim()
@@ -47,9 +47,9 @@
   const retryButton = (onclick, label = 'Reintentar') =>
     h('button', { class: 'ug-btn ug-btn--sm ug-btn--outline', type: 'button', onclick }, icon('refresh'), label)
 
-  // ---- Tasas: estado y avisos --------------------------------------------------
+  // ---- Rates: state and notices --------------------------------------------------
 
-  // A partir de la respuesta de rates:get: tasas derivadas y avisos.
+  // From the rates:get response: derived rates and notices.
   function ratesView(state) {
     const fx = state?.fx
     const p2p = state?.p2p
@@ -84,10 +84,10 @@
     return out
   }
 
-  // "al mes", "al año", "cada 3 meses" para las suscripciones.
+  // "al mes", "al año", "cada 3 meses" (per month, per year…) for subscriptions.
   const periodLabel = (months) => (months === 1 ? 'al mes' : months === 12 ? 'al año' : `cada ${months} meses`)
 
-  // Líneas 01–04 de un precio en ₴. Con months, el precio es de una suscripción.
+  // Lines 01–04 for a price in ₴. With months, the price is a subscription's.
   function conversionLines(uah, view, { numbered = true, months = null } = {}) {
     const c = calc.convertUah(uah, view.rates)
     const r = view.rates
@@ -127,7 +127,7 @@
     )
   }
 
-  // ---- Comparación de regiones ------------------------------------------------------
+  // ---- Region comparison ------------------------------------------------------------
 
   function regionsTable(result, { uaUah, uaFormatted }) {
     const { rows, uaUsd } = result
@@ -224,29 +224,35 @@
     return details
   }
 
-  // ---- Ticket de la ficha -------------------------------------------------------------
+  // ---- Ticket on the game page -------------------------------------------------------
 
   // m: { item, status, price, ratesState, settings, inList, onToggleList,
   //      onRetry, onRetryRates, onOpenOptions, loadRegions }
   function ticket(m) {
     const view = ratesView(m.ratesState)
     const item = m.item
+    // A game page can hold several purchasable blocks. Each one is its own
+    // purchase, so every ticket says which one it is, and only the first keeps
+    // the full letterhead: the rest use a shorter header.
+    const many = (m.position?.total ?? 1) > 1
+    const compact = many && m.position.index > 1
+    const subtitle = item.months ? 'Suscripción en Steam Ucrania' : 'Ticket de compra en Steam Ucrania'
     const top = h(
       'div',
       { class: 'ug-paper ug-piece--top' },
       h(
         'header',
-        { class: 'ug-head' },
+        { class: compact ? 'ug-head ug-head--compact' : 'ug-head' },
         svg(icons.emblem()),
-        h('div', { class: 'ug-brand' }, h('span', { class: 'ug-brand__name', text: 'Ukrainian Gang Extension' }), h('span', { class: 'ug-brand__sub', text: item.months ? 'Suscripción en Steam Ucrania' : 'Ticket de compra en Steam Ucrania' })),
-        h('div', { class: 'ug-meta' }, h('span', { class: 'ug-num', text: `Nº ${item.id}` }), h('span', { class: 'ug-num', text: view.at ? calc.formatDateTime(view.at) : 'Sin tasas' })),
+        h('div', { class: 'ug-brand' }, h('span', { class: 'ug-brand__name', text: 'Ukrainian Gang Extension' }), h('span', { class: 'ug-brand__sub', text: many ? `Compra ${m.position.index} de ${m.position.total}` : subtitle })),
+        h('div', { class: 'ug-meta' }, h('span', { class: 'ug-num', text: `Nº ${item.id}` }), compact ? null : h('span', { class: 'ug-num', text: view.at ? calc.formatDateTime(view.at) : 'Sin tasas' })),
       ),
       h('div', { class: 'ug-title' }, h('span', { class: 'ug-title__name', text: item.name }), item.edition ? h('span', { class: 'ug-title__ed', text: item.edition }) : null),
     )
 
     const bottom = h('div', { class: 'ug-paper ug-piece--bottom' }, svg(icons.emblem({ className: 'ug-watermark', ink: false })))
     const uah = m.price ? m.price.final / 100 : null
-    // Las suscripciones no se comparan: cada región tiene sus propios planes.
+    // Subscriptions are not compared: each region has its own plans.
     const regionsAllowed = m.settings.regionCompare && item.type !== 'bundle' && !item.months && m.settings.regions.length > 0
     const regions = () =>
       regionsAllowed ? regionsBlock({ uaUah: m.status === 'priced' ? uah : null, uaFormatted: uah != null ? calc.formatUah(uah) : '', load: m.loadRegions, regionCount: m.settings.regions.length }) : null
@@ -315,7 +321,7 @@
     return h('div', { class: 'ug-status' }, h('span', { class: 'ug-status__icon' }, icon(iconName)), h('div', { class: 'ug-status__text' }, h('strong', { text: title }), h('span', { text })))
   }
 
-  // ---- Talón de las listas ---------------------------------------------------------------
+  // ---- Stub in lists ----------------------------------------------------------------------
 
   // m: { title, status, uah, ratesState }
   function stub(m) {
