@@ -9,3 +9,7 @@ desktop.ini
 *.log
 .env
 .env.*
+
+# Capturas que genera la prueba de extremo a extremo
+extensions/steam-precios-ug/tests/e2e/capturas/
+extensions/steam-precios-ug/tools/.iconos.html
