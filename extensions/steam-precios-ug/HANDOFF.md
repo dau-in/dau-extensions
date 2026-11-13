@@ -1,5 +1,7 @@
 # steam-precios-ug: documento de traspaso
 
+> **Histórico.** La extensión ya está construida (v0.1.0). Lo vigente está en [`README.md`](README.md), y el diseño en [`diseno/README.md`](diseno/README.md). Este documento queda como registro de lo que se pidió y se verificó antes de empezar.
+
 Este documento resume todo lo decidido y verificado antes de empezar la extensión. El chat que la construya parte de aquí, sin código previo en esta carpeta.
 
 ## Para quién y para qué
