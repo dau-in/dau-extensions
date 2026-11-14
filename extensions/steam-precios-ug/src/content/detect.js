@@ -45,7 +45,7 @@
       const m = a.getAttribute('href').match(/\/app\/(\d+)/)
       if (m) ids.add(m[1])
     }
-    return ids.size > 1 ? `Incluye ${ids.size} juegos` : ''
+    return ids.size > 1 ? `@includes:${ids.size}` : ''
   }
 
   // Name of the game on the page.
@@ -57,15 +57,17 @@
   // block is something else, such as a package with other games.
   function editionFrom(title, name) {
     if (!name) return null
-    if (title === name) return 'Juego base'
+    if (title === name) return '@base'
     if (title.toLowerCase().startsWith(name.toLowerCase())) {
       const rest = title.slice(name.length).replace(/^[\s:–—-]+/, '').trim()
-      return rest || 'Juego base'
+      return rest || '@base'
     }
     return null
   }
 
-  const periodText = (months) => (months === 1 ? 'Suscripción mensual' : months === 12 ? 'Suscripción anual' : `Suscripción cada ${months} meses`)
+  // Editions are stored in a language-neutral form and translated when drawn,
+  // so switching the language does not need a page reload.
+  const periodText = (months) => `@months:${months}`
 
   // Price shown on the page, only when it is in hryvnias.
   function readPagePrice(scope) {

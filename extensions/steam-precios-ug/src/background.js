@@ -1,6 +1,6 @@
 // Service worker: every network request, the cache, the Lista UG and the
 // rule that adds ?cc=ua to the store.
-importScripts('shared/config.js', 'shared/calc.js', 'shared/sources.js')
+importScripts('shared/i18n.js', 'shared/config.js', 'shared/calc.js', 'shared/sources.js')
 
 const { config, sources } = UG
 const local = chrome.storage.local

@@ -3,6 +3,7 @@
 ;(() => {
   const UG = (globalThis.UG ??= {})
   const { calc, icons, config } = UG
+  const t = (key, vars) => UG.i18n.t(key, vars)
 
   // ---- DOM ------------------------------------------------------------------
 
@@ -44,7 +45,7 @@
     )
   }
 
-  const retryButton = (onclick, label = 'Reintentar') =>
+  const retryButton = (onclick, label = t('common.retry')) =>
     h('button', { class: 'ug-btn ug-btn--sm ug-btn--outline', type: 'button', onclick }, icon('refresh'), label)
 
   // ---- Rates: state and notices --------------------------------------------------
@@ -73,19 +74,19 @@
   function ratesNotices(view, onRetry) {
     const out = []
     if (view.missingFx) {
-      out.push(notice('error', 'alert', 'No se pudieron obtener las tasas de cambio.', 'Sin ellas solo se puede mostrar el precio en ₴. Revisa tu conexión y vuelve a intentarlo.', retryButton(onRetry)))
+      out.push(notice('error', 'alert', t('rates.noFx.title'), t('rates.noFx.detail'), retryButton(onRetry)))
     } else if (view.missingP2p) {
-      out.push(notice('error', 'alert', 'Binance P2P no respondió.', 'Sin su tasa no se puede calcular el precio en bolívares. Vuelve a intentarlo en un momento.', retryButton(onRetry)))
+      out.push(notice('error', 'alert', t('rates.noP2p.title'), t('rates.noP2p.detail'), retryButton(onRetry)))
     } else if (view.p2pOld) {
-      out.push(notice('warn', 'offline', `Tasa de Binance de ${calc.timeAgo(view.p2p.fetchedAt)}.`, view.p2p.stale ? 'No se pudo actualizar; las cifras usan la última tasa conocida.' : 'Las cifras pueden haber cambiado.', retryButton(onRetry, 'Actualizar')))
+      out.push(notice('warn', 'offline', t('rates.p2pOld.title', { ago: calc.timeAgo(view.p2p.fetchedAt) }), view.p2p.stale ? t('rates.p2pOld.stale') : t('rates.p2pOld.changed'), retryButton(onRetry, t('common.update'))))
     } else if (view.fxOld) {
-      out.push(notice('warn', 'offline', `Tasas de mercado de ${calc.timeAgo(view.fx.fetchedAt)}.`, 'No se pudieron actualizar; las cifras usan las últimas conocidas.', retryButton(onRetry, 'Actualizar')))
+      out.push(notice('warn', 'offline', t('rates.fxOld.title', { ago: calc.timeAgo(view.fx.fetchedAt) }), t('rates.fxOld.detail'), retryButton(onRetry, t('common.update'))))
     }
     return out
   }
 
   // "al mes", "al año", "cada 3 meses" (per month, per year…) for subscriptions.
-  const periodLabel = (months) => (months === 1 ? 'al mes' : months === 12 ? 'al año' : `cada ${months} meses`)
+  const periodLabel = (months) => (months === 1 ? t('period.month') : months === 12 ? t('period.year') : t('period.months', { n: months }))
 
   // Lines 01–04 for a price in ₴. With months, the price is a subscription's.
   function conversionLines(uah, view, { numbered = true, months = null } = {}) {
@@ -93,21 +94,21 @@
     const r = view.rates
     const n = (k) => (numbered ? k : '')
     const period = months ? periodLabel(months) : null
-    const lines = [line({ n: n('01'), label: period ? `Precio ${period}` : 'Precio en Steam', note: 'Región Ucrania', amount: calc.formatUah(uah) })]
+    const lines = [line({ n: n('01'), label: period ? t('line.pricePeriod', { period }) : t('line.price'), note: t('line.region'), amount: calc.formatUah(uah) })]
     if (!c) return { lines, conv: null }
-    const hkNote = r.manualUahPerHkd ? `${calc.formatRate(r.uahPerHkd, 3)}₴ por HK$, a mano` : `${calc.formatRate(r.uahPerHkd, 3)}₴ por HK$`
+    const hkNote = r.manualUahPerHkd ? t('line.perHkdManual', { rate: calc.formatRate(r.uahPerHkd, 3) }) : t('line.perHkd', { rate: calc.formatRate(r.uahPerHkd, 3) })
     const usdtNote = r.manualCard
-      ? `${calc.formatRate(r.usdtPerHkd, 4)} USDT por HK$, tarjeta real`
+      ? t('line.perUsdtCard', { rate: calc.formatRate(r.usdtPerHkd, 4) })
       : r.surchargePct
-        ? `${calc.formatRate(r.usdtPerHkd, 4)} USDT por HK$, con ${calc.formatRate(r.surchargePct, 1).replace(/,0$/, '')} % de recargo`
-        : `${calc.formatRate(r.usdtPerHkd, 4)} USDT por HK$`
-    lines.push(line({ n: n('02'), label: 'Tarjeta Hong Kong', note: hkNote, amount: calc.formatHkd(c.hkd) }))
-    lines.push(line({ n: n('03'), label: 'En Binance', note: usdtNote, amount: calc.formatUsdt(c.usdt) }))
-    const totalLabel = period ? `Total ${period} en bolívares` : 'Total en bolívares'
+        ? t('line.perUsdtSurcharge', { rate: calc.formatRate(r.usdtPerHkd, 4), pct: calc.formatRate(r.surchargePct, 1).replace(/[.,]0$/, '').replace(',', t('format.decimal')) })
+        : t('line.perUsdt', { rate: calc.formatRate(r.usdtPerHkd, 4) })
+    lines.push(line({ n: n('02'), label: t('line.hkCard'), note: hkNote, amount: calc.formatHkd(c.hkd) }))
+    lines.push(line({ n: n('03'), label: t('line.binance'), note: usdtNote, amount: calc.formatUsdt(c.usdt) }))
+    const totalLabel = period ? t('line.totalPeriod', { period }) : t('line.total')
     lines.push(
       c.ves != null
-        ? line({ n: n('04'), label: totalLabel, note: `${calc.formatVes(r.vesPerUsdt)} por USDT`, amount: calc.formatVes(c.ves), cls: 'ug-line--total' })
-        : line({ n: n('04'), label: totalLabel, note: 'Sin tasa de Binance', amount: '—', cls: 'ug-line--total ug-line--empty' }),
+        ? line({ n: n('04'), label: totalLabel, note: t('line.perUsdtRate', { rate: calc.formatVes(r.vesPerUsdt) }), amount: calc.formatVes(c.ves), cls: 'ug-line--total' })
+        : line({ n: n('04'), label: totalLabel, note: t('line.noP2p'), amount: '—', cls: 'ug-line--total ug-line--empty' }),
     )
     return { lines, conv: c }
   }
@@ -121,37 +122,40 @@
     return h(
       'p',
       { class: 'ug-suggest' },
-      'Tarjetas sugeridas: ',
+      t('suggest.label'),
       h('b', { text }),
-      s.spare >= 0.01 ? ` (sobran ${calc.formatHkd(s.spare)})` : '',
+      s.spare >= 0.01 ? t('suggest.spare', { amount: calc.formatHkd(s.spare) }) : '',
     )
   }
 
   // ---- Region comparison ------------------------------------------------------------
 
+  // Region names come from config so they follow the UI language.
+  const regionLabel = (r) => (r.cc === 'ua' ? t('regions.ua') : config.regionName(r.cc))
+
   function regionsTable(result, { uaUah, uaFormatted }) {
     const { rows, uaUsd } = result
     const all = [...rows]
-    if (uaUsd != null) all.push({ cc: 'ua', name: 'Ucrania', status: 'priced', local: uaFormatted, usd: uaUsd, delta: 0, self: true })
+    if (uaUsd != null) all.push({ cc: 'ua', name: t('regions.ua'), status: 'priced', local: uaFormatted, usd: uaUsd, delta: 0, self: true })
     all.sort((a, b) => (a.usd ?? Infinity) - (b.usd ?? Infinity))
-    const statusText = { unavailable: 'No se vende', free: 'Gratis', error: 'Sin datos', unsupported: 'Sin datos' }
+    const statusText = { unavailable: t('regions.unavailable'), free: t('regions.free'), error: t('regions.nodata'), unsupported: t('regions.nodata') }
     const body = all.map((r) =>
       r.usd == null && !r.self
         ? h(
             'tr',
             { class: 'is-muted' },
             h('td', {}, h('span', { class: 'ug-code', text: r.cc.toUpperCase() })),
-            h('th', { scope: 'row', text: r.name }),
-            h('td', { class: 'ug-col-num', colspan: 3, text: r.status === 'priced' ? 'Sin tasa' : statusText[r.status] ?? 'Sin datos' }),
+            h('th', { scope: 'row', text: regionLabel(r) }),
+            h('td', { class: 'ug-col-num', colspan: 3, text: r.status === 'priced' ? t('common.noRate') : statusText[r.status] ?? t('regions.nodata') }),
           )
         : h(
             'tr',
             { class: r.self ? 'is-self' : null },
             h('td', {}, h('span', { class: 'ug-code', text: r.cc.toUpperCase() })),
-            h('th', { scope: 'row', text: r.name }),
+            h('th', { scope: 'row', text: regionLabel(r) }),
             h('td', { class: 'ug-col-num ug-col-local', text: r.local ?? '' }),
             h('td', { class: 'ug-col-num', text: calc.formatUsd(r.usd) }),
-            h('td', { class: 'ug-col-num', text: r.self ? 'base' : r.delta == null ? '—' : calc.formatPercent(r.delta) }),
+            h('td', { class: 'ug-col-num', text: r.self ? t('common.base') : r.delta == null ? '—' : calc.formatPercent(r.delta) }),
           ),
     )
     return h(
@@ -160,23 +164,23 @@
       h(
         'table',
         { class: 'ug-table' },
-        h('caption', { class: 'ug-vh', text: 'Precio por región, de más barata a más cara' }),
+        h('caption', { class: 'ug-vh', text: t('regions.caption') }),
         h(
           'thead',
           {},
           h(
             'tr',
             {},
-            h('th', { scope: 'col', text: 'Región' }),
-            h('th', { scope: 'col' }, h('span', { class: 'ug-vh', text: 'Nombre' })),
-            h('th', { scope: 'col', class: 'ug-col-num ug-col-local', text: 'Precio' }),
-            h('th', { scope: 'col', class: 'ug-col-num', text: 'En USD' }),
-            h('th', { scope: 'col', class: 'ug-col-num', text: uaUah != null ? 'Frente a UA' : '' }),
+            h('th', { scope: 'col', text: t('regions.region') }),
+            h('th', { scope: 'col' }, h('span', { class: 'ug-vh', text: t('regions.name') })),
+            h('th', { scope: 'col', class: 'ug-col-num ug-col-local', text: t('regions.price') }),
+            h('th', { scope: 'col', class: 'ug-col-num', text: t('regions.usd') }),
+            h('th', { scope: 'col', class: 'ug-col-num', text: uaUah != null ? t('regions.vsUa') : '' }),
           ),
         ),
         h('tbody', {}, body),
       ),
-      h('p', { class: 'ug-table__foot', text: 'Precios pasados a USD con la tasa de mercado. No incluye lo que cuesta comprar tarjetas de cada región.' }),
+      h('p', { class: 'ug-table__foot', text: t('regions.foot') }),
     )
   }
 
@@ -184,26 +188,26 @@
     const { cheaper, pricedCount, uaUsd, rows } = result
     if (uaUsd == null) {
       const best = rows.find((r) => r.usd != null)
-      return best ? { good: false, text: `Desde ${calc.formatUsd(best.usd)} en ${best.name}` } : { good: false, text: 'Sin precio en otras regiones' }
+      return best ? { good: false, text: t('regions.from', { price: calc.formatUsd(best.usd), name: regionLabel(best) }) } : { good: false, text: t('regions.none') }
     }
-    if (!pricedCount) return { good: false, text: 'Sin precio en otras regiones' }
-    if (!cheaper.length) return { good: true, text: `La más barata de ${pricedCount + 1} regiones` }
+    if (!pricedCount) return { good: false, text: t('regions.none') }
+    if (!cheaper.length) return { good: true, text: t('regions.cheapest', { n: pricedCount + 1 }) }
     if (cheaper.length === 1) {
       const r = cheaper[0]
-      return { good: false, text: `${r.name} sale ${Math.abs(Math.round(r.delta))} % más barata` }
+      return { good: false, text: t('regions.cheaperOne', { name: regionLabel(r), pct: Math.abs(Math.round(r.delta)) }) }
     }
-    return { good: false, text: `${cheaper.length} regiones salen más baratas` }
+    return { good: false, text: t('regions.cheaperMany', { n: cheaper.length }) }
   }
 
   function regionsBlock({ uaUah, uaFormatted, load, regionCount }) {
-    const hint = h('span', { class: 'ug-regions__hint' }, `Compara con ${calc.pluralize(regionCount, 'región', 'regiones')}`)
+    const hint = h('span', { class: 'ug-regions__hint' }, t(regionCount === 1 ? 'regions.hintOne' : 'regions.hintMany', { n: regionCount }))
     const body = h('div', { class: 'ug-regions__body', 'aria-live': 'polite' })
-    const details = h('details', { class: 'ug-regions' }, h('summary', {}, h('span', { class: 'ug-regions__toggle' }, icon('chevron'), 'Comparar regiones'), hint), body)
+    const details = h('details', { class: 'ug-regions' }, h('summary', {}, h('span', { class: 'ug-regions__toggle' }, icon('chevron'), t('regions.compare')), hint), body)
     let state = 'idle'
 
     async function run() {
       state = 'loading'
-      body.replaceChildren(h('ol', { class: 'ug-lines', 'aria-busy': 'true' }, [1, 2, 3].map(() => h('li', { class: 'ug-line' }, h('span'), h('span', { class: 'ug-skeleton' }), h('span', { class: 'ug-skeleton ug-skeleton--amt' })))), h('span', { class: 'ug-vh', text: 'Buscando precios en otras regiones…' }))
+      body.replaceChildren(h('ol', { class: 'ug-lines', 'aria-busy': 'true' }, [1, 2, 3].map(() => h('li', { class: 'ug-line' }, h('span'), h('span', { class: 'ug-skeleton' }), h('span', { class: 'ug-skeleton ug-skeleton--amt' })))), h('span', { class: 'ug-vh', text: t('regions.loading') }))
       try {
         const data = await load()
         const result = calc.compareRegions({ uaUah, entries: data.entries, fx: data.fx?.rates })
@@ -214,7 +218,7 @@
         state = 'ready'
       } catch (e) {
         state = 'idle'
-        body.replaceChildren(notice('error', 'alert', 'No se pudieron cargar las otras regiones.', 'Steam no respondió. Vuelve a intentarlo en un momento.', retryButton(run)))
+        body.replaceChildren(notice('error', 'alert', t('regions.error.title'), t('regions.error.detail'), retryButton(run)))
       }
     }
 
@@ -236,7 +240,7 @@
     // the full letterhead: the rest use a shorter header.
     const many = (m.position?.total ?? 1) > 1
     const compact = many && m.position.index > 1
-    const subtitle = item.months ? 'Suscripción en Steam Ucrania' : 'Ticket de compra en Steam Ucrania'
+    const subtitle = item.months ? t('ticket.subscriptionSub') : t('ticket.purchaseSub')
     const top = h(
       'div',
       { class: 'ug-paper ug-piece--top' },
@@ -244,10 +248,10 @@
         'header',
         { class: compact ? 'ug-head ug-head--compact' : 'ug-head' },
         svg(icons.emblem()),
-        h('div', { class: 'ug-brand' }, h('span', { class: 'ug-brand__name', text: 'Ukrainian Gang Extension' }), h('span', { class: 'ug-brand__sub', text: many ? `Compra ${m.position.index} de ${m.position.total}` : subtitle })),
-        h('div', { class: 'ug-meta' }, h('span', { class: 'ug-num', text: `Nº ${item.id}` }), compact ? null : h('span', { class: 'ug-num', text: view.at ? calc.formatDateTime(view.at) : 'Sin tasas' })),
+        h('div', { class: 'ug-brand' }, h('span', { class: 'ug-brand__name', text: 'Ukrainian Gang Extension' }), h('span', { class: 'ug-brand__sub', text: many ? t('ticket.purchaseIndex', { n: m.position.index, total: m.position.total }) : subtitle })),
+        h('div', { class: 'ug-meta' }, h('span', { class: 'ug-num', text: `Nº ${item.id}` }), compact ? null : h('span', { class: 'ug-num', text: view.at ? calc.formatDateTime(view.at) : t('ticket.noRates') })),
       ),
-      h('div', { class: 'ug-title' }, h('span', { class: 'ug-title__name', text: item.name }), item.edition ? h('span', { class: 'ug-title__ed', text: item.edition }) : null),
+      h('div', { class: 'ug-title' }, h('span', { class: 'ug-title__name', text: item.name }), item.edition ? h('span', { class: 'ug-title__ed', text: UG.i18n.editionLabel(item.edition) }) : null),
     )
 
     const bottom = h('div', { class: 'ug-paper ug-piece--bottom' }, svg(icons.emblem({ className: 'ug-watermark', ink: false })))
@@ -261,29 +265,29 @@
       bottom.setAttribute('aria-busy', 'true')
       bottom.append(
         h('ol', { class: 'ug-lines' }, [1, 2, 3, 4].map(() => h('li', { class: 'ug-line' }, h('span'), h('span', { class: 'ug-skeleton' }), h('span', { class: 'ug-skeleton ug-skeleton--amt' })))),
-        h('span', { class: 'ug-vh', text: 'Buscando el precio en Ucrania…' }),
+        h('span', { class: 'ug-vh', text: t('ticket.loading') }),
       )
     } else if (m.status === 'error') {
-      bottom.append(notice('error', 'alert', 'No se pudo obtener el precio en Ucrania.', 'Steam no respondió. Vuelve a intentarlo en un momento.', retryButton(m.onRetry)))
+      bottom.append(notice('error', 'alert', t('ticket.error.title'), t('ticket.error.detail'), retryButton(m.onRetry)))
     } else if (m.status === 'free') {
-      bottom.append(status('gift', 'Gratis en Steam Ucrania', 'No hace falta recargar saldo para esta edición.'))
+      bottom.append(status('gift', t('ticket.free.title'), t('ticket.free.detail')))
     } else if (m.status === 'unavailable') {
-      bottom.append(status('ban', 'No se vende en Steam Ucrania', 'Esta edición no está a la venta en la región Ucrania. Compara su precio en otras regiones.'))
+      bottom.append(status('ban', t('ticket.unavailable.title'), t('ticket.unavailable.detail')))
       const r = regions()
       if (r) bottom.append(r)
     } else if (m.status === 'nodata') {
       bottom.append(
-        status('info', 'Sin precio de Ucrania', 'Steam no da el precio de esta edición por su API. Con «Mostrar la tienda en ₴» encendido se lee de la página.'),
-        h('div', {}, h('button', { class: 'ug-link', type: 'button', onclick: m.onOpenOptions }, 'Abrir los ajustes')),
+        status('info', t('ticket.nodata.title'), t('ticket.nodata.detail')),
+        h('div', {}, h('button', { class: 'ug-link', type: 'button', onclick: m.onOpenOptions }, t('ticket.openSettings'))),
       )
     } else {
       const lines = []
       if (m.price.discountPercent > 0 && m.price.initial > m.price.final) {
-        lines.push(line({ label: 'Precio normal', amount: calc.formatUah(m.price.initial / 100), cls: 'ug-line--muted' }))
-        lines.push(line({ label: `Descuento del ${m.price.discountPercent} %`, amount: calc.formatUah(-(m.price.initial - m.price.final) / 100), cls: 'ug-line--discount' }))
+        lines.push(line({ label: t('ticket.normalPrice'), amount: calc.formatUah(m.price.initial / 100), cls: 'ug-line--muted' }))
+        lines.push(line({ label: t('ticket.discount', { n: m.price.discountPercent }), amount: calc.formatUah(-(m.price.initial - m.price.final) / 100), cls: 'ug-line--discount' }))
       }
       const { lines: conv, conv: c } = conversionLines(uah, view, { months: item.months })
-      bottom.append(h('ol', { class: 'ug-lines', 'aria-label': 'De grivnas a bolívares' }, lines, conv))
+      bottom.append(h('ol', { class: 'ug-lines', 'aria-label': t('ticket.linesAria') }, lines, conv))
       bottom.append(...ratesNotices(view, m.onRetryRates))
       if (m.settings.suggestCards && c) {
         const s = suggestionLine(c.hkd)
@@ -297,12 +301,12 @@
           class: 'ug-btn',
           type: 'button',
           'aria-pressed': String(Boolean(m.inList)),
-          'aria-label': `Lista UG: ${[item.name, item.edition !== 'Juego base' ? item.edition : ''].filter(Boolean).join(', ')}`,
+          'aria-label': t('ticket.listAria', { items: [item.name, !UG.i18n.isBaseEdition(item.edition) ? UG.i18n.editionLabel(item.edition) : ''].filter(Boolean).join(', ') }),
           onclick: () => m.onToggleList(button),
         },
         icon('plus', 'off'),
         icon('check', 'on'),
-        'Lista UG',
+        t('list.name'),
       )
       bottom.append(
         h(
@@ -314,7 +318,7 @@
       )
     }
 
-    return h('article', { class: 'ug-root ug-ticket ug-ticket-wrap', 'aria-label': `Ticket UG de ${item.name}` }, top, bottom)
+    return h('article', { class: 'ug-root ug-ticket ug-ticket-wrap', 'aria-label': t('ticket.aria', { name: item.name }) }, top, bottom)
   }
 
   function status(iconName, title, text) {
@@ -328,7 +332,7 @@
     const view = ratesView(m.ratesState)
     const wrap = h('span', { class: 'ug-root' })
     if (m.status === 'unavailable') {
-      wrap.append(h('span', { class: 'ug-stub ug-stub--muted' }, h('span', { class: 'ug-paper ug-stub__paper' }, h('span', { class: 'ug-stub__mark' }, svg(icons.smallMark())), h('span', { class: 'ug-stub__v', text: 'No se vende en UA' }))))
+      wrap.append(h('span', { class: 'ug-stub ug-stub--muted' }, h('span', { class: 'ug-paper ug-stub__paper' }, h('span', { class: 'ug-stub__mark' }, svg(icons.smallMark())), h('span', { class: 'ug-stub__v', text: t('stub.notSold') }))))
       return { el: wrap, tip: null }
     }
     const c = calc.convertUah(m.uah, view.rates)
@@ -344,12 +348,12 @@
         h('span', { class: 'ug-stub__v', text: main }),
         h('span', { class: 'ug-stub__v ug-stub__v--sub', text: calc.formatHkd(c.hkd, 0) }),
       ),
-      h('span', { class: 'ug-vh', text: ` En Steam Ucrania: ${calc.formatUah(m.uah)}, unos ${main} o ${calc.formatHkd(c.hkd)}.` }),
+      h('span', { class: 'ug-vh', text: t('stub.sr', { uah: calc.formatUah(m.uah), main, hkd: calc.formatHkd(c.hkd) }) }),
     )
     const rows = [
-      ['Precio en Steam Ucrania', calc.formatUah(m.uah)],
-      ['Tarjeta Hong Kong', calc.formatHkd(c.hkd)],
-      ['En Binance', calc.formatUsdt(c.usdt)],
+      [t('stub.price'), calc.formatUah(m.uah)],
+      [t('line.hkCard'), calc.formatHkd(c.hkd)],
+      [t('line.binance'), calc.formatUsdt(c.usdt)],
     ]
     const tip = h(
       'div',
@@ -359,10 +363,10 @@
         'dl',
         {},
         rows.map(([k, v]) => [h('dt', { text: k }), h('dd', { text: v })]),
-        h('dt', { text: 'Total en bolívares' }),
-        h('dd', { class: 'ug-tip__total', text: c.ves != null ? calc.formatVes(c.ves) : 'Sin tasa' }),
+        h('dt', { text: t('stub.total') }),
+        h('dd', { class: 'ug-tip__total', text: c.ves != null ? calc.formatVes(c.ves) : t('common.noRate') }),
       ),
-      h('p', { class: 'ug-tip__foot', text: view.at ? `Tasas de ${calc.timeAgo(view.at)}` : '' }),
+      h('p', { class: 'ug-tip__foot', text: view.at ? t('rates.fromAgo', { ago: calc.timeAgo(view.at) }) : '' }),
     )
     wrap.append(stubEl, tip)
     return { el: wrap, tip, anchor: stubEl }

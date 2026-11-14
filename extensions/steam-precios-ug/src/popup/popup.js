@@ -1,6 +1,7 @@
 // Popup: the Lista UG as a long receipt.
 ;(async () => {
   const { calc, icons, render, dom } = UG
+  const t = (key, vars) => UG.i18n.t(key, vars)
   const { h, svg, icon, line, retryButton } = dom
   const app = document.getElementById('app')
 
@@ -22,7 +23,7 @@
 
   // ---- Data ------------------------------------------------------------------------
 
-  const itemLabel = (i) => [i.name, i.edition && i.edition !== 'Juego base' ? i.edition : ''].filter(Boolean).join(' ')
+  const itemLabel = (i) => [i.name, i.edition && !UG.i18n.isBaseEdition(i.edition) ? UG.i18n.editionLabel(i.edition) : ''].filter(Boolean).join(' ')
 
   // Price in ₴ of each game: the API's, or the one it had when it was added.
   function priceOf(i) {
@@ -58,14 +59,14 @@
   async function removeItem(item) {
     const before = state.list
     state.list = await send('list:remove', { key: item.key })
-    state.undo = { text: `Se quitó ${itemLabel(item)}.`, list: before }
+    state.undo = { text: t('popup.removed', { name: itemLabel(item) }), list: before }
     draw({ focus: 'undo' })
   }
 
   async function clearList() {
     const before = state.list
     state.list = await send('list:set', { list: [] })
-    state.undo = { text: 'Lista vaciada.', list: before }
+    state.undo = { text: t('popup.cleared'), list: before }
     draw({ focus: 'undo' })
   }
 
@@ -92,12 +93,12 @@
       ta.remove()
     }
     button.dataset.state = 'on'
-    button.querySelector('[data-label]').textContent = 'Copiado'
-    status.textContent = 'Resumen copiado. Pégalo en WhatsApp o Discord.'
+    button.querySelector('[data-label]').textContent = t('popup.copied')
+    status.textContent = t('popup.copiedStatus')
     clearTimeout(copySummary.timer)
     copySummary.timer = setTimeout(() => {
       button.dataset.state = 'off'
-      button.querySelector('[data-label]').textContent = 'Copiar resumen'
+      button.querySelector('[data-label]').textContent = t('popup.copy')
       status.textContent = ''
     }, 2500)
   }
@@ -116,14 +117,15 @@
   function walletRows(total, view) {
     if (state.wallet == null || total == null) return []
     const diff = total - state.wallet
-    if (diff <= 0) return [h('dt', { text: 'Te alcanza' }), h('dd', { class: 'is-ok', text: `Sobran ${calc.formatUah(-diff)}` })]
+    if (diff <= 0) return [h('dt', { text: t('popup.enough') }), h('dd', { class: 'is-ok', text: t('popup.leftOver', { amount: calc.formatUah(-diff) }) })]
     const c = calc.convertUah(diff, view.rates)
-    return [h('dt', { text: 'Falta recargar' }), h('dd', { class: 'is-short', text: c ? `${calc.formatUah(diff)} ≈ ${calc.formatHkd(c.hkd)}` : calc.formatUah(diff) })]
+    return [h('dt', { text: t('popup.topUp') }), h('dd', { class: 'is-short', text: c ? `${calc.formatUah(diff)} ≈ ${calc.formatHkd(c.hkd)}` : calc.formatUah(diff) })]
   }
 
   // ---- Render ---------------------------------------------------------------------------
 
   function draw({ focus } = {}) {
+    document.title = t('list.name')
     const view = render_ratesView()
     const s = state.settings
     const items = state.list
@@ -138,15 +140,15 @@
       { class: 'ug-receipt__head' },
       svg(icons.emblem()),
       h('span', { class: 'ug-brand__name', text: 'Ukrainian Gang Extension' }),
-      h('h1', { class: 'ug-receipt__title', text: 'Lista UG' }),
-      h('div', { class: 'ug-meta' }, h('span', { class: 'ug-num', text: view.at ? calc.formatDateTime(view.at) : 'Sin tasas' }), h('span', { text: calc.pluralize(items.length, 'juego', 'juegos') })),
+      h('h1', { class: 'ug-receipt__title', text: t('list.name') }),
+      h('div', { class: 'ug-meta' }, h('span', { class: 'ug-num', text: view.at ? calc.formatDateTime(view.at) : t('ticket.noRates') }), h('span', { text: t(items.length === 1 ? 'popup.gamesOne' : 'popup.gamesMany', { n: items.length }) })),
     )
 
     const toolbar = h(
       'div',
       { class: 'ug-toolbar' },
-      items.length ? h('button', { class: 'ug-link', type: 'button', onclick: clearList }, 'Vaciar lista') : h('span'),
-      h('button', { class: 'ug-link', type: 'button', onclick: () => chrome.runtime.openOptionsPage() }, icon('settings'), 'Ajustes'),
+      items.length ? h('button', { class: 'ug-link', type: 'button', onclick: clearList }, t('popup.clear')) : h('span'),
+      h('button', { class: 'ug-link', type: 'button', onclick: () => chrome.runtime.openOptionsPage() }, icon('settings'), t('popup.settings')),
     )
 
     const parts = [head, toolbar, h('div', { class: 'ug-rule', 'aria-hidden': 'true' })]
@@ -156,29 +158,29 @@
         h(
           'div',
           { class: 'ug-empty' },
-          h('strong', { text: 'La lista está vacía' }),
-          h('span', { text: 'Pulsa «Lista UG» en el ticket de un juego para sumar su precio aquí.' }),
-          h('a', { class: 'ug-btn ug-btn--outline ug-btn--sm', href: 'https://store.steampowered.com/', target: '_blank', rel: 'noopener', style: 'margin-top:8px' }, 'Abrir la tienda'),
+          h('strong', { text: t('popup.emptyTitle') }),
+          h('span', { text: t('popup.emptyText') }),
+          h('a', { class: 'ug-btn ug-btn--outline ug-btn--sm', href: 'https://store.steampowered.com/', target: '_blank', rel: 'noopener', style: 'margin-top:8px' }, t('popup.openStore')),
         ),
       )
     } else {
       parts.push(
         h(
           'ol',
-          { class: 'ug-lines', 'aria-label': 'Juegos' },
+          { class: 'ug-lines', 'aria-label': t('popup.gamesAria') },
           priced.map(({ i, p }, n) => {
             const notes = []
-            if (i.edition) notes.push(h('small', { text: i.edition }))
-            if (p.discount > 0) notes.push(h('small', { class: 'ug-note-red', text: `Descuento del ${p.discount} %` }))
-            if (p.source === 'saved') notes.push(h('small', { text: 'Precio de cuando lo añadiste' }))
-            const amount = p.loading ? h('span', { class: 'ug-skeleton ug-skeleton--amt' }) : h('span', { class: 'ug-amt', text: p.source === 'free' ? 'Gratis' : Number.isFinite(p.uah) ? calc.formatUah(p.uah) : 'Sin precio' })
+            if (i.edition) notes.push(h('small', { text: UG.i18n.editionLabel(i.edition) }))
+            if (p.discount > 0) notes.push(h('small', { class: 'ug-note-red', text: t('popup.discount', { n: p.discount }) }))
+            if (p.source === 'saved') notes.push(h('small', { text: t('popup.savedPrice') }))
+            const amount = p.loading ? h('span', { class: 'ug-skeleton ug-skeleton--amt' }) : h('span', { class: 'ug-amt', text: p.source === 'free' ? t('popup.free') : Number.isFinite(p.uah) ? calc.formatUah(p.uah) : t('popup.noPrice') })
             return h(
               'li',
               { class: 'ug-line ug-line--item' },
               h('span', { class: 'ug-n', text: String(n + 1).padStart(2, '0') }),
               h('span', { class: 'ug-desc' }, i.url ? h('a', { class: 'ug-item-link', href: i.url, target: '_blank', rel: 'noopener', text: i.name }) : h('span', { text: i.name }), notes),
               amount,
-              h('button', { class: 'ug-remove', type: 'button', 'aria-label': `Quitar ${itemLabel(i)} de la lista`, onclick: () => removeItem(i) }, icon('x')),
+              h('button', { class: 'ug-remove', type: 'button', 'aria-label': t('popup.remove', { name: itemLabel(i) }), onclick: () => removeItem(i) }, icon('x')),
             )
           }),
         ),
@@ -190,8 +192,8 @@
         parts.push(h('ol', { class: 'ug-lines', 'aria-busy': 'true' }, [1, 2, 3].map(() => h('li', { class: 'ug-line' }, h('span'), h('span', { class: 'ug-skeleton' }), h('span', { class: 'ug-skeleton ug-skeleton--amt' })))))
       } else if (total != null) {
         const { lines, conv } = render.conversionLines(total, view, { numbered: false })
-        lines[0] = line({ label: 'Subtotal', note: missing.length ? `${calc.pluralize(missing.length, 'juego', 'juegos')} sin precio no ${missing.length === 1 ? 'entra' : 'entran'}` : null, amount: calc.formatUah(total), cls: 'ug-line--plain' })
-        parts.push(h('ol', { class: 'ug-lines', 'aria-label': 'Total, de grivnas a bolívares' }, lines))
+        lines[0] = line({ label: t('popup.subtotal'), note: missing.length ? t(missing.length === 1 ? 'popup.missingOne' : 'popup.missingMany', { n: missing.length }) : null, amount: calc.formatUah(total), cls: 'ug-line--plain' })
+        parts.push(h('ol', { class: 'ug-lines', 'aria-label': t('popup.totalAria') }, lines))
         parts.push(...render.ratesNotices(view, refreshRates))
 
         // Wallet
@@ -205,9 +207,9 @@
           placeholder: '0',
           'aria-describedby': 'wallet-result',
         })
-        if (state.wallet != null) walletInput.value = calc.formatNumber(state.wallet, { decimals: 2, thousands: '', decimal: ',', trimZeros: true })
+        if (state.wallet != null) walletInput.value = calc.formatNumber(state.wallet, { decimals: 2, thousands: '', decimal: t('format.decimal'), trimZeros: true })
         const walletWrap = h('span', { class: 'ug-input-wrap' }, walletInput, h('span', { 'aria-hidden': 'true', text: '₴' }))
-        const walletError = h('p', { class: 'ug-field__error', id: 'wallet-error', hidden: true, text: 'Escribe el saldo en grivnas, por ejemplo 500 o 499,50.' })
+        const walletError = h('p', { class: 'ug-field__error', id: 'wallet-error', hidden: true, text: t('popup.walletError') })
         const result = h('dl', { class: 'ug-sub', id: 'wallet-result', 'aria-live': 'polite' }, walletRows(total, view))
         walletInput.addEventListener('input', () => {
           const r = parseAmount(walletInput.value)
@@ -221,7 +223,7 @@
           result.replaceChildren(...walletRows(total, view))
           updateSuggest()
         })
-        parts.push(h('div', { class: 'ug-field' }, h('label', { for: 'wallet', text: 'Saldo en billetera' }), walletWrap, walletError), result)
+        parts.push(h('div', { class: 'ug-field' }, h('label', { for: 'wallet', text: t('popup.wallet') }), walletWrap, walletError), result)
 
         const suggestSlot = h('div')
         const updateSuggest = () => {
@@ -239,16 +241,16 @@
           { class: 'ug-btn ug-btn--block', type: 'button', 'data-state': 'off', onclick: () => copySummary(copy, status) },
           icon('copy', 'off'),
           icon('check', 'on'),
-          h('span', { 'data-label': '', text: 'Copiar resumen' }),
+          h('span', { 'data-label': '', text: t('popup.copy') }),
         )
         parts.push(copy, status)
       } else {
-        parts.push(h('p', { class: 'ug-help', text: 'Ningún juego de la lista tiene precio en Steam Ucrania.' }))
+        parts.push(h('p', { class: 'ug-help', text: t('popup.nonePriced') }))
       }
     }
 
     // Undo
-    const undoBtn = state.undo ? h('button', { class: 'ug-link', type: 'button', onclick: undo }, 'Deshacer') : null
+    const undoBtn = state.undo ? h('button', { class: 'ug-link', type: 'button', onclick: undo }, t('popup.undo')) : null
     parts.push(h('div', { class: 'ug-snackbar', role: 'status', hidden: !state.undo }, state.undo ? [h('span', { text: state.undo.text }), undoBtn] : []))
 
     // Rates
@@ -258,20 +260,20 @@
       h('div', { class: 'ug-rule', 'aria-hidden': 'true' }),
       h(
         'dl',
-        { class: 'ug-sub', 'aria-label': 'Tasas' },
-        h('dt', { class: view.p2pOld ? 'is-stale' : null, text: p2p ? `Tasa P2P, ${calc.timeAgo(p2p.fetchedAt)}` : 'Tasa P2P' }),
-        h('dd', { text: p2p ? calc.formatVes(p2p.price) : 'Sin datos' }),
-        h('dt', { class: view.fxOld ? 'is-stale' : null, text: fx ? `HK$ a mercado, ${calc.timeAgo(fx.fetchedAt)}` : 'HK$ a mercado' }),
-        h('dd', { text: view.rates ? `${calc.formatRate(view.rates.uahPerHkd, 3)}₴` : 'Sin datos' }),
+        { class: 'ug-sub', 'aria-label': t('popup.ratesAria') },
+        h('dt', { class: view.p2pOld ? 'is-stale' : null, text: p2p ? t('popup.p2pRateAgo', { ago: calc.timeAgo(p2p.fetchedAt) }) : t('popup.p2pRate') }),
+        h('dd', { text: p2p ? calc.formatVes(p2p.price) : t('common.noData') }),
+        h('dt', { class: view.fxOld ? 'is-stale' : null, text: fx ? t('popup.marketAgo', { ago: calc.timeAgo(fx.fetchedAt) }) : t('popup.market') }),
+        h('dd', { text: view.rates ? `${calc.formatRate(view.rates.uahPerHkd, 3)}₴` : t('common.noData') }),
       ),
-      h('div', { class: 'ug-toolbar' }, h('span'), h('button', { class: 'ug-link', type: 'button', onclick: refreshRates }, icon('refresh'), 'Actualizar tasas')),
+      h('div', { class: 'ug-toolbar' }, h('span'), h('button', { class: 'ug-link', type: 'button', onclick: refreshRates }, icon('refresh'), t('popup.refresh'))),
     )
 
     if (total != null) {
       const digits = String(Math.round(total * 100))
       parts.push(h('div', { class: 'ug-code-block' }, svg(icons.barcode(digits)), h('span', { class: 'ug-barcode__digits', 'aria-hidden': 'true', text: digits })))
     }
-    parts.push(h('p', { class: 'ug-receipt__foot', text: 'Precios de Steam Ucrania. Tasas de Binance P2P y de mercado.' }))
+    parts.push(h('p', { class: 'ug-receipt__foot', text: t('popup.foot') }))
 
     app.replaceChildren(...parts)
     app.setAttribute('aria-busy', String(loading))
@@ -289,6 +291,7 @@
   const [list, settings, stored] = await Promise.all([send('list:get'), send('settings:get'), chrome.storage.local.get('wallet')])
   state.list = list
   state.settings = settings
+  UG.i18n.setLang(settings.lang)
   state.wallet = Number.isFinite(stored.wallet) ? stored.wallet : null
   draw()
   await Promise.all([loadRates(false), loadPrices(true)])

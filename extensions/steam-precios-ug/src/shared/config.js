@@ -6,28 +6,30 @@
   const MIN = 60 * 1000
   const HOUR = 60 * MIN
 
+  // Region names in both languages: the settings page shows them and so does
+  // the comparison table.
   const REGIONS = [
-    { cc: 'us', name: 'Estados Unidos' },
-    { cc: 'hk', name: 'Hong Kong' },
-    { cc: 'ar', name: 'Argentina' },
-    { cc: 'tr', name: 'Turquía' },
-    { cc: 'kz', name: 'Kazajistán' },
-    { cc: 'ru', name: 'Rusia' },
-    { cc: 'br', name: 'Brasil' },
-    { cc: 'de', name: 'Alemania' },
-    { cc: 'pl', name: 'Polonia' },
-    { cc: 'gb', name: 'Reino Unido' },
-    { cc: 'mx', name: 'México' },
-    { cc: 'cl', name: 'Chile' },
-    { cc: 'co', name: 'Colombia' },
-    { cc: 'pe', name: 'Perú' },
-    { cc: 'in', name: 'India' },
-    { cc: 'cn', name: 'China' },
-    { cc: 'jp', name: 'Japón' },
-    { cc: 'id', name: 'Indonesia' },
-    { cc: 'ph', name: 'Filipinas' },
-    { cc: 'za', name: 'Sudáfrica' },
-    { cc: 'ca', name: 'Canadá' },
+    { cc: 'us', en: 'United States', es: 'Estados Unidos' },
+    { cc: 'hk', en: 'Hong Kong', es: 'Hong Kong' },
+    { cc: 'ar', en: 'Argentina', es: 'Argentina' },
+    { cc: 'tr', en: 'Turkey', es: 'Turquía' },
+    { cc: 'kz', en: 'Kazakhstan', es: 'Kazajistán' },
+    { cc: 'ru', en: 'Russia', es: 'Rusia' },
+    { cc: 'br', en: 'Brazil', es: 'Brasil' },
+    { cc: 'de', en: 'Germany', es: 'Alemania' },
+    { cc: 'pl', en: 'Poland', es: 'Polonia' },
+    { cc: 'gb', en: 'United Kingdom', es: 'Reino Unido' },
+    { cc: 'mx', en: 'Mexico', es: 'México' },
+    { cc: 'cl', en: 'Chile', es: 'Chile' },
+    { cc: 'co', en: 'Colombia', es: 'Colombia' },
+    { cc: 'pe', en: 'Peru', es: 'Perú' },
+    { cc: 'in', en: 'India', es: 'India' },
+    { cc: 'cn', en: 'China', es: 'China' },
+    { cc: 'jp', en: 'Japan', es: 'Japón' },
+    { cc: 'id', en: 'Indonesia', es: 'Indonesia' },
+    { cc: 'ph', en: 'Philippines', es: 'Filipinas' },
+    { cc: 'za', en: 'South Africa', es: 'Sudáfrica' },
+    { cc: 'ca', en: 'Canada', es: 'Canadá' },
   ]
 
   const DEFAULTS = Object.freeze({
@@ -41,6 +43,7 @@
     listTags: true,
     regionCompare: true,
     suggestCards: false,
+    lang: 'en',
   })
 
   // Steam Hong Kong gift card denominations, in HK$.
@@ -84,10 +87,15 @@
       listTags: bool(r.listTags, DEFAULTS.listTags),
       regionCompare: bool(r.regionCompare, DEFAULTS.regionCompare),
       suggestCards: bool(r.suggestCards, DEFAULTS.suggestCards),
+      lang: UG.i18n?.LANGUAGES.includes(r.lang) ? r.lang : DEFAULTS.lang,
     }
   }
 
-  const regionName = (cc) => REGIONS.find((r) => r.cc === cc)?.name ?? cc.toUpperCase()
+  // Name of a region in the current UI language.
+  const regionName = (cc) => {
+    const region = REGIONS.find((r) => r.cc === cc)
+    return region ? region[UG.i18n?.lang ?? 'en'] ?? region.en : cc.toUpperCase()
+  }
 
   UG.config = { REGIONS, DEFAULTS, HK_DENOMINATIONS, CACHE_MS, STALE_MS, normalizeSettings, regionName }
 })()

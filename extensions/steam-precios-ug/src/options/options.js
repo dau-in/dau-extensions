@@ -1,8 +1,10 @@
 // Settings: saved as soon as each control changes.
 ;(async () => {
-  const { config, calc, icons, render } = UG
+  const { config, calc, icons, render, i18n } = UG
+  const t = (key, vars) => i18n.t(key, vars)
   const form = document.getElementById('form')
   const saved = document.getElementById('saved')
+  const regionsBox = document.getElementById('regions')
 
   async function send(type, payload = {}) {
     const r = await chrome.runtime.sendMessage({ type, ...payload })
@@ -12,27 +14,41 @@
 
   document.getElementById('emblem').outerHTML = icons.emblem()
 
-  // Regions
-  const regionsBox = document.getElementById('regions')
-  for (const r of config.REGIONS) {
-    const label = document.createElement('label')
-    label.className = 'ug-choice'
-    const input = document.createElement('input')
-    input.type = 'checkbox'
-    input.name = 'regions'
-    input.value = r.cc
-    label.append(input, r.name)
-    regionsBox.append(label)
+  // Text of the page in the current language.
+  function applyText() {
+    document.documentElement.lang = i18n.lang
+    document.title = t('options.title')
+    for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n)
+  }
+
+  function buildRegions(selected = []) {
+    regionsBox.replaceChildren()
+    for (const r of config.REGIONS) {
+      const label = document.createElement('label')
+      label.className = 'ug-choice'
+      const input = document.createElement('input')
+      input.type = 'checkbox'
+      input.name = 'regions'
+      input.value = r.cc
+      input.checked = selected.includes(r.cc)
+      label.append(input, r[i18n.lang] ?? r.en)
+      regionsBox.append(label)
+    }
   }
 
   const numberInputs = [...form.querySelectorAll('input[data-min]')]
-  const fmt = (n) => calc.formatNumber(n, { decimals: 4, thousands: '', decimal: ',', trimZeros: true }).replace(/(,\d*?)0+$/, '$1').replace(/,$/, '')
+  const fmt = (n) =>
+    calc
+      .formatNumber(n, { decimals: 4, thousands: '', decimal: i18n.lang === 'es' ? ',' : '.', trimZeros: true })
+      .replace(/([.,]\d*?)0+$/, '$1')
+      .replace(/[.,]$/, '')
 
   function fill(s) {
     for (const key of ['storeInUah', 'listTags', 'regionCompare', 'suggestCards']) form.elements[key].checked = s[key]
     for (const input of numberInputs) input.value = fmt(s[input.name])
     for (const radio of form.querySelectorAll('input[name="p2pSide"]')) radio.checked = radio.value === s.p2pSide
-    for (const box of form.querySelectorAll('input[name="regions"]')) box.checked = s.regions.includes(box.value)
+    for (const radio of form.querySelectorAll('input[name="lang"]')) radio.checked = radio.value === s.lang
+    buildRegions(s.regions)
   }
 
   // Validates a number field; returns the number, or null if it is invalid.
@@ -51,6 +67,8 @@
   }
 
   let current = await send('settings:get')
+  i18n.setLang(current.lang)
+  applyText()
   fill(current)
 
   let timer
@@ -58,14 +76,21 @@
     const next = { ...current }
     for (const key of ['storeInUah', 'listTags', 'regionCompare', 'suggestCards']) next[key] = form.elements[key].checked
     next.p2pSide = form.querySelector('input[name="p2pSide"]:checked')?.value ?? 'BUY'
+    next.lang = form.querySelector('input[name="lang"]:checked')?.value ?? 'en'
     next.regions = [...form.querySelectorAll('input[name="regions"]:checked')].map((b) => b.value)
     for (const input of numberInputs) {
       const n = readNumber(input)
       if (n == null) return
       next[input.name] = n
     }
+    const languageChanged = next.lang !== current.lang
     current = await send('settings:set', { settings: next })
-    saved.textContent = 'Guardado'
+    if (languageChanged) {
+      i18n.setLang(current.lang)
+      applyText()
+      fill(current)
+    }
+    saved.textContent = t('options.saved')
     clearTimeout(timer)
     timer = setTimeout(() => (saved.textContent = ''), 2000)
     loadRates(false)
@@ -89,20 +114,20 @@
     const view = render.ratesView(state)
     const rows = []
     const add = (dt, dd, stale) => {
-      const t = document.createElement('dt')
-      t.textContent = dt
-      if (stale) t.className = 'is-stale'
+      const el = document.createElement('dt')
+      el.textContent = dt
+      if (stale) el.className = 'is-stale'
       const d = document.createElement('dd')
       d.textContent = dd
-      rows.push(t, d)
+      rows.push(el, d)
     }
-    add(view.p2p ? `USDT en Binance P2P, ${calc.timeAgo(view.p2p.fetchedAt)}` : 'USDT en Binance P2P', view.p2p ? calc.formatVes(view.p2p.price) : 'Sin datos', view.p2pOld)
-    add(view.fx ? `₴ por HK$ a mercado, ${calc.timeAgo(view.fx.fetchedAt)}` : '₴ por HK$ a mercado', view.fx ? `${calc.formatRate(view.fx.rates.UAH / view.fx.rates.HKD, 3)}₴` : 'Sin datos', view.fxOld)
+    add(view.p2p ? t('options.p2pRateAgo', { ago: calc.timeAgo(view.p2p.fetchedAt) }) : t('options.p2pRate'), view.p2p ? calc.formatVes(view.p2p.price) : t('common.noData'), view.p2pOld)
+    add(view.fx ? t('options.marketRateAgo', { ago: calc.timeAgo(view.fx.fetchedAt) }) : t('options.marketRate'), view.fx ? `${calc.formatRate(view.fx.rates.UAH / view.fx.rates.HKD, 3)}₴` : t('common.noData'), view.fxOld)
     if (view.rates) {
-      add('₴ por HK$ que se usa', `${calc.formatRate(view.rates.uahPerHkd, 3)}₴`)
-      add('USDT por HK$ que se usa', calc.formatRate(view.rates.usdtPerHkd, 4))
+      add(t('options.usedUah'), `${calc.formatRate(view.rates.uahPerHkd, 3)}₴`)
+      add(t('options.usedUsdt'), calc.formatRate(view.rates.usdtPerHkd, 4))
     }
-    if (view.fx) add('Fuente de las tasas de mercado', view.fx.source)
+    if (view.fx) add(t('options.source'), view.fx.source)
     ratesBox.replaceChildren(...rows)
   }
   document.getElementById('refresh').addEventListener('click', () => loadRates(true))

@@ -2,8 +2,9 @@
   "manifest_version": 3,
   "name": "Ukrainian Gang Extension",
   "short_name": "UG Extension",
-  "version": "0.1.2",
-  "description": "Precios de Steam Ucrania en HK$, USDT y bolívares (Binance P2P), con una lista de compra para el grupo.",
+  "version": "0.2.0",
+  "default_locale": "en",
+  "description": "__MSG_extDescription__",
   "minimum_chrome_version": "125",
   "icons": {
     "16": "icons/icon-16.png",
@@ -12,7 +13,7 @@
     "128": "icons/icon-128.png"
   },
   "action": {
-    "default_title": "Lista UG",
+    "default_title": "__MSG_actionTitle__",
     "default_popup": "src/popup/popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
@@ -26,7 +27,10 @@
   "background": {
     "service_worker": "src/background.js"
   },
-  "permissions": ["storage", "declarativeNetRequestWithHostAccess"],
+  "permissions": [
+    "storage",
+    "declarativeNetRequestWithHostAccess"
+  ],
   "host_permissions": [
     "https://store.steampowered.com/*",
     "https://p2p.binance.com/*",
@@ -36,8 +40,11 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://store.steampowered.com/*"],
+      "matches": [
+        "https://store.steampowered.com/*"
+      ],
       "js": [
+        "src/shared/i18n.js",
         "src/shared/config.js",
         "src/shared/calc.js",
         "src/shared/icons.js",
@@ -50,8 +57,13 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["fonts/martian-mono-latin.woff2", "fonts/martian-mono-latin-ext.woff2"],
-      "matches": ["https://store.steampowered.com/*"]
+      "resources": [
+        "fonts/martian-mono-latin.woff2",
+        "fonts/martian-mono-latin-ext.woff2"
+      ],
+      "matches": [
+        "https://store.steampowered.com/*"
+      ]
     }
   ]
 }

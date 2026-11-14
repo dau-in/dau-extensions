@@ -175,19 +175,21 @@
 
   // ---- Text ----------------------------------------------------------------------
 
-  const plural = new Intl.PluralRules('es')
-  const pluralize = (n, one, other) => `${n} ${plural.select(n) === 'one' ? one : other}`
+  // Plural in the current UI language: UG.i18n picks the form.
+  const pluralize = (n, one, other) => `${n}${NBSP}${new Intl.PluralRules(UG.i18n?.lang ?? 'en').select(n) === 'one' ? one : other}`
 
-  // "hace 3 min", "hace 2 h", "hace 1 día" (3 min ago, 2 h ago, 1 day ago)
+  // "3 min ago", "2 h ago", "1 day ago" / "hace 3 min", "hace 2 h", "hace 1 día"
   function timeAgo(ts, now = Date.now()) {
-    if (!Number.isFinite(ts)) return 'sin fecha'
+    const t = (key, vars) => (UG.i18n ? UG.i18n.t(key, vars) : key)
+    if (!Number.isFinite(ts)) return t('time.noDate')
     const s = Math.max(0, Math.round((now - ts) / 1000))
-    if (s < 60) return 'hace un momento'
+    if (s < 60) return t('time.justNow')
     const m = Math.round(s / 60)
-    if (m < 60) return `hace ${m}${NBSP}min`
+    if (m < 60) return t('time.minAgo', { n: m })
     const h = Math.round(m / 60)
-    if (h < 48) return `hace ${h}${NBSP}h`
-    return `hace ${pluralize(Math.round(h / 24), 'día', 'días')}`
+    if (h < 24) return t('time.hourAgo', { n: h })
+    const d = Math.round(h / 24)
+    return t(d === 1 ? 'time.dayAgo' : 'time.daysAgo', { n: d })
   }
 
   const pad = (n) => String(n).padStart(2, '0')

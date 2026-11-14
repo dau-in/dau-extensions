@@ -36,6 +36,7 @@
   sheet.replaceSync(await send('styles:get'))
 
   let settings = await send('settings:get')
+  UG.i18n.setLang(settings.lang)
   let list = await send('list:get')
   let ratesState = null
   let ratesLoading = null
@@ -266,6 +267,7 @@
     }
     if (changes.settings) {
       settings = UG.config.normalizeSettings(changes.settings.newValue)
+      UG.i18n.setLang(settings.lang)
       loadRates({ again: true })
         .catch(() => null)
         .then(() => {
