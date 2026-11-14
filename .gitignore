@@ -10,6 +10,10 @@ desktop.ini
 .env
 .env.*
 
+# Local only: agent instructions and third-party skills
+.opencode/
+AGENTS.md
+
 # Screenshots written by the end-to-end test
 extensions/steam-precios-ug/tests/e2e/screenshots/
 extensions/steam-precios-ug/tools/.icons.html
