@@ -61,7 +61,6 @@ GitHub Actions checks the manifests and runs the unit tests on every push to `ma
 ```
 dau-extensions/
 ├── extensions/          one folder per extension, each self-contained
-├── archive/             old versions and experiments that are no longer used
 ├── tools/               repo-wide tools
 └── .github/workflows/   continuous integration
 ```
