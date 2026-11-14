@@ -16,7 +16,7 @@ The chosen direction is **Receipt**: every price is shown as a printed receipt o
 - **Martian Mono** everywhere, at three widths: 87.5 % for text, 100 % for large figures and 112.5 % for titles. It ships with the extension (OFL) in two subsets, latin and latin-ext; the second has the ₴.
 - **"Ticket stub" emblem.** A ticket stub with "UKRAINIAN GANG", "EXTENSION" and the UG monogram crossed by the two bars of the hryvnia sign. Drawn as a rubber stamp with slightly worn ink. At 16–32 px a simplified version is used: the blue stub with "UG".
 - **No text separators** such as "·" or "|". Structure comes from spacing, receipt lines and shape.
-- **Several purchases, several tickets.** When a game page has more than one purchasable block, every ticket says which one it is ("Compra 2 de 3") and only the first keeps the full letterhead; the rest use a shorter header with a smaller emblem and no date, so the page is not a stack of identical headers.
+- **Several purchases, several tickets.** When a game page has more than one purchasable block, every ticket says which one it is ("Purchase 2 of 3") and only the first keeps the full letterhead; the rest use a shorter header with a smaller emblem and no date, so the page is not a stack of identical headers.
 - **Minimal motion.** Only color transitions, the disclosure arrow and the button shrinking when pressed. With `prefers-reduced-motion` the scale, rotation and loading pulse go away.
 - **Windows high contrast.** The perforation masks are dropped and system borders are drawn instead.
 

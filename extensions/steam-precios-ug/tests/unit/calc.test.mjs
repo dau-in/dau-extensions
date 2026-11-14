@@ -3,7 +3,8 @@ import assert from 'node:assert/strict'
 import '../support/load-shared.mjs'
 
 const { calc, config } = globalThis.UG
-const NB = ' '
+const UG = globalThis.UG
+const NB = '\u00a0'
 
 // Example from the handoff: fx.UAH 41.6, fx.HKD 7.78, P2P 1078 and a 3 % surcharge.
 const HANDOFF = { fx: { UAH: 41.6, HKD: 7.78, USD: 1 }, p2p: 1078, settings: { ...config.DEFAULTS, sellerSurchargePct: 3 } }
@@ -125,16 +126,40 @@ test('summary to copy', () => {
   assert.ok(!text.includes(' '), 'the copied text has no non-breaking spaces')
 })
 
-test('time texts and plurals', () => {
+test('time texts and plurals in English and Spanish', () => {
   const now = Date.parse('2026-11-13T12:00:00Z')
+  const es = (n, one, other) => `${n}${NB}${n === 1 ? one : other}`
+
+  UG.i18n.setLang('es')
   assert.equal(calc.timeAgo(now - 20 * 1000, now), 'hace un momento')
   assert.equal(calc.timeAgo(now - 3 * 60 * 1000, now), `hace 3${NB}min`)
   assert.equal(calc.timeAgo(now - 2 * 3600 * 1000, now), `hace 2${NB}h`)
-  assert.equal(calc.timeAgo(now - 72 * 3600 * 1000, now), 'hace 3 días')
-  assert.equal(calc.pluralize(1, 'juego', 'juegos'), '1 juego')
-  assert.equal(calc.pluralize(2, 'juego', 'juegos'), '2 juegos')
-  assert.equal(calc.pluralize(0, 'juego', 'juegos'), '0 juegos')
+  assert.equal(calc.timeAgo(now - 72 * 3600 * 1000, now), `hace 3${NB}días`)
+  assert.equal(calc.timeAgo(now - 24 * 3600 * 1000, now), `hace 1${NB}día`)
+  assert.equal(calc.timeAgo(NaN, now), 'sin fecha')
+  assert.equal(calc.pluralize(1, 'juego', 'juegos'), es(1, 'juego', 'juegos'))
+
+  UG.i18n.setLang('en')
+  assert.equal(calc.timeAgo(now - 20 * 1000, now), 'just now')
+  assert.equal(calc.timeAgo(now - 3 * 60 * 1000, now), `3${NB}min ago`)
+  assert.equal(calc.timeAgo(now - 2 * 3600 * 1000, now), `2${NB}h ago`)
+  assert.equal(calc.timeAgo(now - 72 * 3600 * 1000, now), `3${NB}days ago`)
+  assert.equal(calc.timeAgo(now - 24 * 3600 * 1000, now), `1${NB}day ago`)
+  assert.equal(calc.timeAgo(NaN, now), 'undated')
+  assert.equal(calc.pluralize(1, 'game', 'games'), es(1, 'game', 'games'))
+
   assert.match(calc.formatDateTime(Date.UTC(2026, 10, 12, 14, 32)), /^\d{2}\/\d{2}\/2026 \d{2}:\d{2}$/)
+})
+
+test('settings: language, defaults and unknown regions', () => {
+  assert.equal(config.normalizeSettings({}).lang, 'en')
+  assert.equal(config.normalizeSettings({ lang: 'es' }).lang, 'es')
+  assert.equal(config.normalizeSettings({ lang: 'fr' }).lang, 'en')
+  UG.i18n.setLang('es')
+  assert.equal(config.regionName('us'), 'Estados Unidos')
+  UG.i18n.setLang('en')
+  assert.equal(config.regionName('us'), 'United States')
+  assert.equal(config.regionName('xx'), 'XX')
 })
 
 test('settings: defaults, limits and unknown regions', () => {

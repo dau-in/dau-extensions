@@ -13,7 +13,8 @@ const IMAGES = {
   'ticket.png': '01-game-ticket.png',
   'search.png': '13-search.png',
   'popup.png': '14-popup.png',
-  'settings.png': '16-settings.png'
+  'settings.png': '16-settings.png',
+  'settings-spanish.png': '16b-settings-spanish.png'
 }
 
 await mkdir(DOCS, { recursive: true })

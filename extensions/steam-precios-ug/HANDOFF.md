@@ -45,7 +45,7 @@ The extension removes step 1 and the guesswork in the others. Next to each price
 The user asked for **the best possible UX and very careful aesthetics**. The UI must live alongside Steam's without breaking it, but be recognizable at a glance as the extension's own.
 
 - First design a **design system**: OKLCH color tokens, type scale, spacing, radii, shadows, states and motion. Then build the pieces.
-- Use the skills in `.opencode/skills/`: `better-colors`, `better-typography`, `better-layout`, `better-ui`, `better-accessibility` and `better-writing`. Review the result with `better-interface`.
+- Design with the interface design skills used for this project: color, typography, layout, UI, accessibility and writing. Review the result end to end.
 - Inject the store UI inside **Shadow DOM**, so Steam's styles do not affect it and its own do not leak.
 - Steam's palette, to stand apart without clashing: dark teal-blue backgrounds (`#1b2838`, `#171a21`), text `#c6d4df`, blue accent `#66c0f4` and price green `#beee11`.
 - Figures use `font-variant-numeric: tabular-nums`.

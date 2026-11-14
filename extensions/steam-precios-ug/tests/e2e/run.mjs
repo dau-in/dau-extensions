@@ -48,7 +48,7 @@ const browser = await puppeteer.launch({
   enableExtensions: true,
   userDataDir: PROFILE,
   defaultViewport: { width: 1280, height: 900 },
-  args: ['--lang=es-ES', '--window-size=1280,900'],
+  args: ['--lang=en-US', '--window-size=1280,900'],
 })
 
 const extensionErrors = []
@@ -154,7 +154,7 @@ async function steamCookies(page) {
     { name: 'birthtime', value: '315532801', domain: 'store.steampowered.com', path: '/' },
     { name: 'lastagecheckage', value: '1-January-1980', domain: 'store.steampowered.com', path: '/' },
     { name: 'wants_mature_content', value: '1', domain: 'store.steampowered.com', path: '/' },
-    { name: 'Steam_Language', value: 'spanish', domain: 'store.steampowered.com', path: '/' },
+    { name: 'Steam_Language', value: 'english', domain: 'store.steampowered.com', path: '/' },
   )
 }
 
@@ -249,10 +249,10 @@ await step('Comparar regiones loads the table with Ukraine and the chosen region
   await summary.click()
   await app.waitForFunction(() => document.querySelector('ug-extension-ui').shadowRoot.querySelectorAll('.ug-table tbody tr').length >= 5, { timeout: 45000 })
   const rows = await app.evaluate(() => [...document.querySelector('ug-extension-ui').shadowRoot.querySelectorAll('.ug-table tbody tr')].map((r) => r.textContent))
-  assert.ok(rows.some((r) => r.includes('Ucrania')), 'Ukraine is missing')
-  assert.ok(rows.some((r) => r.includes('Estados Unidos')), `United States is missing:\n${rows.join('\n')}`)
+  assert.ok(rows.some((r) => r.includes('Ukraine')), 'Ukraine is missing')
+  assert.ok(rows.some((r) => r.includes('United States')), `United States is missing:\n${rows.join('\n')}`)
   const hint = await app.evaluate(() => document.querySelector('ug-extension-ui').shadowRoot.querySelector('.ug-regions__hint').textContent)
-  assert.ok(/regiones|más barata|Desde/.test(hint), hint)
+  assert.ok(/regions|cheaper|From/.test(hint), hint)
   await shot(app, '02-game-regions', 'ug-extension-ui')
 })
 
@@ -304,10 +304,10 @@ await step('States: discount, no data and free', async () => {
   await app.reload({ waitUntil: 'domcontentloaded' })
   await waitTickets(app, 3)
   const texts = await hostsText(app)
-  assert.match(texts[0], /Descuento del 40/)
-  assert.match(texts[0], /Precio normal/)
-  assert.match(texts[1], /Sin precio de Ucrania/)
-  assert.match(texts[2], /Gratis en Steam Ucrania/)
+  assert.match(texts[0], /40 % off/)
+  assert.match(texts[0], /Normal price/)
+  assert.match(texts[1], /No Ukraine price/)
+  assert.match(texts[2], /Free on Steam Ukraine/)
   const hosts = await app.$$('ug-extension-ui')
   for (const [i, name] of [[0, '05-state-discount'], [1, '06-state-no-data'], [2, '07-state-free']]) {
     await hosts[i].scrollIntoView()
@@ -328,7 +328,7 @@ await step('State: not sold in Ukraine', async () => {
   await app.reload({ waitUntil: 'domcontentloaded' })
   await waitTickets(app, subs.length)
   const [text] = await hostsText(app)
-  assert.match(text, /No se vende en Steam Ucrania/)
+  assert.match(text, /Not sold on Steam Ukraine/)
   await shot(app, '08-state-unavailable', 'ug-extension-ui')
 })
 
@@ -343,7 +343,7 @@ await step('State: Steam does not answer → error with a working retry', async 
   await app.goto(`${STORE}/app/620/?cc=us`, { waitUntil: 'domcontentloaded' })
   await waitTickets(app, 1)
   let [text] = await hostsText(app)
-  assert.match(text, /No se pudo obtener el precio en Ucrania/)
+  assert.match(text, /Could not get the price in Ukraine/)
   await shot(app, '09-state-steam-error', 'ug-extension-ui')
   blocked = false
   const retry = await app.$('ug-extension-ui >>> .ug-notice .ug-btn')
@@ -364,8 +364,8 @@ await step('Binance offline: uses the last rate and says so', async () => {
   await app.reload({ waitUntil: 'domcontentloaded' })
   await waitTickets(app, 1)
   let [text] = await hostsText(app)
-  assert.match(text, /Tasa de Binance de hace 3/)
-  assert.match(text, /No se pudo actualizar/)
+  assert.match(text, /Binance rate from 3/)
+  assert.match(text, /It could not be refreshed/)
   assert.match(text, /Bs/)
   await shot(app, '10-state-old-rate', 'ug-extension-ui')
 
@@ -373,7 +373,7 @@ await step('Binance offline: uses the last rate and says so', async () => {
   await app.reload({ waitUntil: 'domcontentloaded' })
   await waitTickets(app, 1)
   ;[text] = await hostsText(app)
-  assert.match(text, /Binance P2P no respondió/)
+  assert.match(text, /Binance P2P did not answer/)
   assert.match(text, /HK\$/)
   await shot(app, '11-state-no-p2p', 'ug-extension-ui')
   await cdp.send('Fetch.disable')
@@ -475,21 +475,21 @@ await step('Popup: the list shows the games, the total and the conversions', asy
   const text = await popup.$eval('#app', (el) => el.textContent)
   assert.match(text, /ELDEN RING/)
   assert.match(text, /Portal 2/)
-  assert.match(text, /2 juegos/)
+  assert.match(text, /2 games/)
   assert.match(text, /Subtotal/)
-  assert.match(text, /Total en bolívares/)
+  assert.match(text, /Total in bolívares/)
 })
 
 await step('Popup: the wallet works out what is left to top up and validates input', async () => {
   await popup.type('#wallet', '500')
-  await popup.waitForFunction(() => /Falta recargar/.test(document.querySelector('#wallet-result').textContent))
+  await popup.waitForFunction(() => /Top up/.test(document.querySelector('#wallet-result').textContent))
   await popup.click('#wallet', { count: 3 })
   await popup.type('#wallet', 'abc')
   await popup.waitForFunction(() => !document.querySelector('#wallet-error').hidden)
   assert.equal(await popup.$eval('#wallet', (el) => el.getAttribute('aria-invalid')), '')
   await popup.click('#wallet', { count: 3 })
   await popup.type('#wallet', '999999')
-  await popup.waitForFunction(() => /Te alcanza/.test(document.querySelector('#wallet-result').textContent))
+  await popup.waitForFunction(() => /You have enough/.test(document.querySelector('#wallet-result').textContent))
   await popup.click('#wallet', { count: 3 })
   await popup.type('#wallet', '500')
   const stored = await sw(async () => (await chrome.storage.local.get('wallet')).wallet)
@@ -499,7 +499,7 @@ await step('Popup: the wallet works out what is left to top up and validates inp
 await step('Popup: "Copiar resumen" copies the WhatsApp text', async () => {
   await popup.screenshot({ path: join(SHOTS, '14-popup.png'), fullPage: true })
   await popup.click('.ug-btn--block')
-  await popup.waitForFunction(() => document.querySelector('.ug-btn--block').textContent.includes('Copiado'))
+  await popup.waitForFunction(() => document.querySelector('.ug-btn--block').textContent.includes('Copied'))
   const clip = await popup.evaluate(() => navigator.clipboard.readText())
   assert.match(clip, /^ELDEN RING .+₴ \+ Portal 2 240₴ = .+₴ ≈ HK\$ \d+ ≈ [\d.,]+ USDT ≈ Bs [\d.]+$/, clip)
 })
@@ -513,15 +513,15 @@ await step('Popup: removing a game can be undone', async () => {
   await popup.click('.ug-remove')
   await popup.waitForFunction(() => !document.querySelector('.ug-snackbar').hidden)
   assert.equal((await sw(() => getList())).length, before - 1)
-  assert.equal(await popup.evaluate(() => document.activeElement?.textContent), 'Deshacer')
+  assert.equal(await popup.evaluate(() => document.activeElement?.textContent), 'Undo')
   await popup.click('.ug-snackbar .ug-link')
   await popup.waitForFunction((n) => document.querySelectorAll('.ug-line--item').length === n, {}, before)
   assert.equal((await sw(() => getList())).length, before)
 })
 
 await step('Popup: clearing the list shows the empty state', async () => {
-  await popup.$$eval('.ug-toolbar .ug-link', (els) => els.find((e) => e.textContent.includes('Vaciar')).click())
-  await popup.waitForFunction(() => /La lista está vacía/.test(document.body.textContent))
+  await popup.$$eval('.ug-toolbar .ug-link', (els) => els.find((e) => e.textContent.includes('Clear')).click())
+  await popup.waitForFunction(() => /The list is empty/.test(document.body.textContent))
   assert.equal((await sw(() => getList())).length, 0)
   assert.equal(await sw(() => chrome.action.getBadgeText({})), '')
   await popup.screenshot({ path: join(SHOTS, '15-popup-empty.png'), fullPage: true })
@@ -541,7 +541,7 @@ await step('Settings: values load and save on change', async () => {
   assert.equal(await options.$eval('#storeInUah', (el) => el.checked), true)
   assert.equal(await options.$eval('#p2pAds', (el) => el.value), '5')
   await options.click('#suggestCards')
-  await options.waitForFunction(() => document.querySelector('#saved').textContent === 'Guardado')
+  await options.waitForFunction(() => document.querySelector('#saved').textContent === 'Saved')
   assert.equal((await sw(() => getSettings())).suggestCards, true)
   await options.click('#sellerSurchargePct', { count: 3 })
   await options.type('#sellerSurchargePct', '3,5')
@@ -568,19 +568,58 @@ await step('Settings accessibility (axe, WCAG 2.2 AA)', async () => {
   assert.deepEqual(await axe(options), [])
 })
 
+await step('Settings: switching to Spanish translates the settings, the list and the ticket', async () => {
+  await options.bringToFront()
+  await options.click('input[name="lang"][value="es"]')
+  await options.waitForFunction(() => document.querySelector('#saved').textContent === 'Guardado', { timeout: 5000 })
+  assert.equal((await sw(() => getSettings())).lang, 'es')
+  assert.equal(await options.$eval('html', (el) => el.lang), 'es')
+  assert.equal(await options.$eval('.ug-receipt__title', (el) => el.textContent), 'Ajustes')
+  assert.match(await options.$eval('#regions', (el) => el.textContent), /Estados Unidos/)
+  await options.screenshot({ path: join(SHOTS, '16b-settings-spanish.png'), fullPage: true })
+
+  // The popup is drawn in Spanish on the next open.
+  await popup.bringToFront()
+  await popup.reload({ waitUntil: 'load' })
+  await popup.waitForFunction(() => document.querySelector('.ug-receipt__title')?.textContent === 'Lista UG', { timeout: 20000 })
+  const popupText = await popup.$eval('#app', (el) => el.textContent)
+  assert.match(popupText, /2 juegos/)
+  assert.match(popupText, /Vaciar lista/)
+  assert.match(popupText, /Ajustes/)
+
+  // The ticket on the game page switches to Spanish without a reload.
+  await app.bringToFront()
+  await app.goto(`${STORE}/app/620/`, { waitUntil: 'domcontentloaded' })
+  await app.waitForFunction(
+    () => /Precio en Steam/.test(document.querySelector('ug-extension-ui')?.shadowRoot?.textContent ?? ''),
+    { timeout: 30000, polling: 250 },
+  )
+  const esText = (await hostsText(app)).join('\n')
+  assert.match(esText, /Precio en Steam/)
+  assert.match(esText, /Región Ucrania/)
+  assert.match(esText, /Juego base/)
+  await shot(app, '16c-ticket-spanish', 'ug-extension-ui')
+
+  // Back to English: the README images and the rest of the run use it.
+  await options.bringToFront()
+  await options.click('input[name="lang"][value="en"]')
+  await options.waitForFunction(() => document.querySelector('#saved').textContent === 'Saved', { timeout: 5000 })
+  assert.equal((await sw(() => getSettings())).lang, 'en')
+})
+
 await step('Settings: suggested cards appear on the ticket', async () => {
   await app.goto(`${STORE}/app/620/`, { waitUntil: 'domcontentloaded' })
   await waitTickets(app, 1)
   const [text] = await hostsText(app)
-  assert.match(text, /Tarjetas sugeridas: .*HK\$/)
-  assert.match(text, /3,5 % de recargo/)
+  assert.match(text, /Suggested cards: .*HK\$/)
+  assert.match(text, /3\.5 % surcharge/)
   await shot(app, '17-game-suggested-cards', 'ug-extension-ui')
 })
 
 await step('Settings: turning stubs off removes them from search right away', async () => {
   await options.bringToFront()
   await options.click('#listTags')
-  await options.waitForFunction(() => document.querySelector('#saved').textContent === 'Guardado')
+  await options.waitForFunction(() => document.querySelector('#saved').textContent === 'Saved')
   await search.bringToFront()
   await search.waitForFunction(() => document.querySelectorAll('ug-extension-ui').length === 0, { timeout: 10000, polling: 250 })
   await options.bringToFront()
@@ -594,7 +633,7 @@ await step('Settings: turning stubs off removes them from search right away', as
 await step('Settings: turning off the ₴ store removes the redirect', async () => {
   await options.bringToFront()
   await options.click('#storeInUah')
-  await options.waitForFunction(() => document.querySelector('#saved').textContent === 'Guardado')
+  await options.waitForFunction(() => document.querySelector('#saved').textContent === 'Saved')
   await sleep(300)
   assert.equal((await sw(() => chrome.declarativeNetRequest.getDynamicRules())).length, 0)
   await app.goto(`${STORE}/app/620/`, { waitUntil: 'domcontentloaded' })
@@ -649,16 +688,16 @@ await step('Subscription and a package of other games (GTA San Andreas): each ti
         regions: Boolean(t.querySelector('.ug-regions')),
       })),
   )
-  const sub = tickets.find((t) => /Suscripción/.test(t.edition ?? ''))
+  const sub = tickets.find((t) => /Monthly subscription/.test(t.edition ?? ''))
   if (sub) {
     assert.equal(sub.name, 'GTA+')
-    assert.match(sub.text, /Precio al mes/)
-    assert.match(sub.text, /Total al mes en bolívares/)
+    assert.match(sub.text, /Price per month/)
+    assert.match(sub.text, /Total per month in bolívares/)
     assert.equal(sub.regions, false, 'the subscription does not compare regions')
   }
   const trilogy = tickets.find((t) => /Trilogy/.test(t.name ?? ''))
   assert.ok(trilogy, `the Trilogy ticket is missing: ${JSON.stringify(tickets.map((t) => [t.name, t.edition]))}`)
-  assert.equal(trilogy.edition, 'Incluye 3 juegos')
+  assert.equal(trilogy.edition, 'Includes 3 games')
 
   // With several purchases, each ticket says which one it is, and only the
   // first keeps the full letterhead.
@@ -674,7 +713,7 @@ await step('Subscription and a package of other games (GTA San Andreas): each ti
   )
   assert.equal(heads.length, tickets.length)
   heads.forEach((head, i) => {
-    assert.equal(head.sub, `Compra ${i + 1} de ${heads.length}`)
+    assert.equal(head.sub, `Purchase ${i + 1} of ${heads.length}`)
     assert.equal(head.compact, i > 0, `ticket ${i + 1}: wrong header`)
     assert.equal(head.date, i > 0 ? 1 : 2, `ticket ${i + 1}: wrong number of header lines`)
   })
