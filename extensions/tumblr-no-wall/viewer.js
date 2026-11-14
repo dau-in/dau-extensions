@@ -4,6 +4,31 @@
   //   Pin → saves the full-size image to Pinterest, linked to the original post
   const MIN_SIZE = 120; // ignore avatars and icons
 
+  // The UI follows the browser's language: Spanish for Spanish browsers,
+  // English for everything else.
+  const ES = /^es/i.test(chrome.i18n?.getUILanguage?.() ?? navigator.language ?? '');
+  const T = ES
+    ? {
+        pin: 'Guardar en Pinterest',
+        pinTip: 'Guardar en Pinterest',
+        hdTip: 'Ver a resolución completa',
+        viewPost: 'Ver post',
+        closeTip: 'Cerrar (Esc)',
+        loading: 'Cargando…',
+        zoom: 'clic para acercar',
+        blog: (blog) => `@${blog} en Tumblr`,
+      }
+    : {
+        pin: 'Save to Pinterest',
+        pinTip: 'Save to Pinterest',
+        hdTip: 'View at full resolution',
+        viewPost: 'View post',
+        closeTip: 'Close (Esc)',
+        loading: 'Loading…',
+        zoom: 'click to zoom',
+        blog: (blog) => `@${blog} on Tumblr`,
+      };
+
   function largestSrc(img) {
     let best = img.currentSrc || img.src;
     let bestW = 0;
@@ -38,7 +63,7 @@
         .filter(Boolean)
         .map((t) => '#' + decodeURIComponent(t).replace(/-/g, ' '))
     )].slice(0, 8);
-    const description = [blog && `@${blog} on Tumblr`, tags.join(' ')].filter(Boolean).join(' — ');
+    const description = [blog && T.blog(blog), tags.join(' ')].filter(Boolean).join(' — ');
     return { permalink, description };
   }
 
@@ -60,8 +85,10 @@
   const hover = document.createElement('div');
   hover.className = 'tnw-hover';
   hover.innerHTML = `
-    <button class="tnw-btn tnw-pin-btn" data-act="pin" title="Save to Pinterest">Pin</button>
-    <button class="tnw-btn tnw-hd-btn" data-act="hd" title="View at full resolution">HD</button>`;
+    <button class="tnw-btn tnw-pin-btn" data-act="pin">Pin</button>
+    <button class="tnw-btn tnw-hd-btn" data-act="hd">HD</button>`;
+  hover.querySelector('.tnw-pin-btn').title = T.pinTip;
+  hover.querySelector('.tnw-hd-btn').title = T.hdTip;
   let current = null;
 
   function showHover(img) {
@@ -106,23 +133,28 @@
   viewer.innerHTML = `
     <div class="tnw-viewer-bar">
       <span class="tnw-viewer-info"></span>
-      <button class="tnw-btn tnw-pin-btn tnw-viewer-pin">Guardar en Pinterest</button>
-      <a class="tnw-viewer-post" target="_blank" rel="noopener">Ver post</a>
-      <button class="tnw-viewer-close" title="Close (Esc)">✕</button>
+      <button class="tnw-btn tnw-pin-btn tnw-viewer-pin"></button>
+      <a class="tnw-viewer-post" target="_blank" rel="noopener"></a>
+      <button class="tnw-viewer-close">✕</button>
     </div>
     <div class="tnw-viewer-stage"><img class="tnw-viewer-img" alt=""></div>`;
   const vImg = viewer.querySelector('.tnw-viewer-img');
   const vInfo = viewer.querySelector('.tnw-viewer-info');
   const vPost = viewer.querySelector('.tnw-viewer-post');
+  const vPin = viewer.querySelector('.tnw-viewer-pin');
+  const vClose = viewer.querySelector('.tnw-viewer-close');
+  vPin.textContent = T.pin;
+  vPost.textContent = T.viewPost;
+  vClose.title = T.closeTip;
   let viewerData = null;
 
   function openViewer(url, info) {
     hideHover();
     viewerData = { url, info };
     viewer.classList.remove('tnw-zoomed');
-    vInfo.textContent = 'Loading…';
+    vInfo.textContent = T.loading;
     vImg.onload = () => {
-      vInfo.textContent = `${vImg.naturalWidth} × ${vImg.naturalHeight} — click to zoom`;
+      vInfo.textContent = `${vImg.naturalWidth} × ${vImg.naturalHeight} — ${T.zoom}`;
     };
     vImg.src = url;
     vPost.href = info.permalink;
@@ -136,7 +168,7 @@
     document.documentElement.classList.remove('tnw-viewer-open');
   }
 
-  viewer.querySelector('.tnw-viewer-pin').addEventListener('click', () => {
+  vPin.addEventListener('click', () => {
     if (viewerData) saveToPinterest(viewerData.url, viewerData.info);
   });
   vImg.addEventListener('click', (e) => {
@@ -146,7 +178,7 @@
   viewer.querySelector('.tnw-viewer-stage').addEventListener('click', (e) => {
     if (e.target !== vImg) closeViewer();
   });
-  viewer.querySelector('.tnw-viewer-close').addEventListener('click', closeViewer);
+  vClose.addEventListener('click', closeViewer);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && viewer.style.display === 'flex') {
       e.stopPropagation();

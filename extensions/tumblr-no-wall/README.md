@@ -9,7 +9,7 @@ Browsing Tumblr without an account.
   - **HD** opens a viewer with the largest version Tumblr offers. Click the image to zoom and press `Esc` to close.
   - **Pin** saves the full-size image to Pinterest, linked to the original post, with the blog and the tags as the description.
 
-Version 1.2.1. Works on `*.tumblr.com`. The UI uses Tumblr's own language, so its few labels are in English and in Spanish.
+Version 1.3.0. Works on `*.tumblr.com`. Its few labels follow the browser's language: Spanish for Spanish browsers, English for the rest.
 
 ## Install
 
