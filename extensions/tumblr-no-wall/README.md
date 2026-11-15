@@ -2,12 +2,19 @@
 
 Browsing Tumblr without an account.
 
-![Tumblr with the login wall removed](docs/hero.png)
+| Without the extension | With the extension |
+|---|---|
+| ![The sign-up bar over a Charli XCX post](docs/wall.png) | ![The same post with the wall gone and the Pin and HD buttons](docs/hero.png) |
+| The "Join over 100 million people" bar, over the post | The same post, scrolling, with **Pin** and **HD** on the image |
 
 - Hides the "Sign up or log in" popup and bar and gives scrolling back to the page.
 - Hovering an image in a post shows two buttons:
   - **HD** opens a viewer with the largest version Tumblr offers. Click the image to zoom and press `Esc` to close.
   - **Pin** saves the full-size image to Pinterest, linked to the original post, with the blog and the tags as the description.
+
+The HD viewer, with the largest version Tumblr has for the photo:
+
+![The HD viewer over a Charli XCX post](docs/viewer.png)
 
 Version 1.3.0. Works on `*.tumblr.com`. Its few labels follow the browser's language: Spanish for Spanish browsers, English for the rest.
 
