@@ -2,11 +2,9 @@
 
 A browser extension for the **Ukrainian Gang** Steam family group. They live in Venezuela and their Steam accounts are set to the Ukraine region, so they pay for Hong Kong Steam gift cards with USDT bought on Binance P2P with bolívares. Next to every store price, the extension shows what it costs in ₴, in HK$ (to know which gift card to buy), in USDT and in bolívares at the Binance P2P rate.
 
-Version 0.2.0. Works on `store.steampowered.com`, without signing in and with any VPN. **The UI is in English by default, with Spanish in the settings page**, because the people who use it speak Spanish.
+Version 0.2.1. Works on `store.steampowered.com`, without signing in and with any VPN. **The UI is in English by default, with Spanish in the settings page**, because the people who use it speak Spanish.
 
-| Game page | Search results | Shopping list |
-|-----------|----------------|---------------|
-| ![Receipt under each edition](docs/ticket.png) | ![Stub next to each price](docs/search.png) | ![Popup with the list](docs/popup.png) |
+![A receipt under the YoRHa Edition of NieR:Automata](docs/hero.png)
 
 ## What it does
 
@@ -32,7 +30,27 @@ Version 0.2.0. Works on `store.steampowered.com`, without signing in and with an
   - suggest gift cards (off by default);
   - the language: English (default) or Spanish.
 
-| Settings, in English | The same page in Spanish |
+## Screenshots
+
+**The receipt.** Under the YoRHa Edition of NieR:Automata, the price in ₴, the Hong Kong card, the USDT on Binance and the total in bolívares, with the rate used on every line.
+
+![The receipt under the YoRHa Edition](docs/ticket.png)
+
+**Compare regions.** The same edition in the regions chosen in the settings, in USD and against Ukraine.
+
+![The region comparison, open on the receipt](docs/regions.png)
+
+**Stubs in search.** Bs and HK$ next to every paid price; the full breakdown shows on hover.
+
+![Stubs in a NieR search](docs/search.png)
+
+**The UG list.** The total in the four currencies, the wallet balance and the summary for WhatsApp.
+
+![The UG list popup](docs/popup.png)
+
+**Settings**, in English and in Spanish:
+
+| English | Español |
 |---|---|
 | ![The settings page](docs/settings.png) | ![The settings page in Spanish](docs/settings-spanish.png) |
 
@@ -78,7 +96,7 @@ Steam changes its HTML. When something stops showing up, the fix goes in `src/co
 - **Page type:** the path `/app/<id>`, `/sub/<id>` or `/bundle/<id>`.
 - **Purchasable editions:** every `.game_area_purchase_game` with `input[name="subid"]` (package) or `input[name="bundleid"]` (bundle). The receipt goes after `.game_area_purchase_game_wrapper`.
 - **Edition name:** the block title, such as `Buy «ELDEN RING Shadow of the Erdtree Edition»`, without the verb and without the "BUNDLE (?)" label. If it starts with the game name (`#appHubAppName`), the receipt takes the game name and the rest is the edition (the base game when nothing is left). Otherwise, as with a package of other games ("Grand Theft Auto: The Trilogy"), the receipt takes the block title and, as edition, how many games it includes, counted from `.package_contents`.
-- **Subscriptions:** the block has the `game_area_purchase_game_dropdown_subscription` class or a `.game_purchase_subscription` paragraph with the billing period ("every 1 month(s)").
+- **Subscriptions:** a `.game_purchase_subscription` paragraph with the billing period ("every 1 month(s)", "/ month", "auto-renewed"), or the `game_area_purchase_game_dropdown_subscription` class next to that text. The class alone is not enough: Steam also puts it on bundles.
 - **Price on the page:** `[data-price-final]` in cents, but only when the text has `₴`. Otherwise the price comes from the Steam API, so it works the same with a VPN or with the store in another currency.
 - **Game pages without editions** (free, unavailable or coming soon): the app price is requested and the receipt goes at the start of `#game_area_purchase`.
 - **Lists:** every `.discount_final_price` or `.game_area_dlc_price` inside an element with `data-ds-itemkey` (`App_620`, `Sub_440408`, `Bundle_232`), `data-ds-appid`, `data-ds-packageid` or `data-ds-bundleid`. Prices of 0 or without digits ("Free") get no stub. A `MutationObserver` covers what Steam loads later, such as infinite scroll in search.
@@ -112,7 +130,7 @@ The end-to-end test uses the installed Chrome; `CHROME_PATH` picks another one, 
 - an axe accessibility audit (WCAG 2.2 AA) of the receipt, the popup and the settings page;
 - no extension errors in the console.
 
-`npm run docs` rebuilds the images in `docs/` from the latest end-to-end screenshots.
+`npm run docs` rebuilds the images in `docs/` from the live store with the extension loaded: NieR:Automata, a NieR search and both languages of the settings page. It needs network access and the installed Chrome, and leaves the shopping list in a temporary profile.
 
 ## Files
 
