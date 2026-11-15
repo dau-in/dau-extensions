@@ -27,10 +27,14 @@
 
   // Subscription: "259₴ / month", "auto-renewed every 1 month(s)". Returns the
   // months between charges, or null if the block is not a subscription.
+  // The class alone is not enough: Steam also uses
+  // game_area_purchase_game_dropdown_subscription for bundles.
+  const BILLING = /(?:every|cada)\s+\d+\s*(?:month|mes|year|año)|\/\s*(?:month|mes|year|año)\b|\bper (?:month|year)\b|\bal mes\b|\bevery month\b|auto[- ]?renew/i
   function subscriptionMonths(block) {
     const note = block.querySelector('.game_purchase_subscription')
     if (!note && !/subscription/.test(block.className)) return null
     const t = text(note ?? block)
+    if (!note && !BILLING.test(t)) return null
     const m = t.match(/(?:every|cada)\s+(\d+)\s*(?:month|mes)/i)
     if (m) return Number(m[1])
     if (/\b(year|año)\b/i.test(t)) return 12
