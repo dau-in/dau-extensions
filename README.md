@@ -2,19 +2,17 @@
 
 Personal browser extensions. Each one lives in its own folder under `extensions/` and is loaded in Brave, Chrome, Edge or Opera as an unpacked extension.
 
-| Extension | What it does | State |
-|-----------|--------------|-------|
-| [`steam-precios-ug`](extensions/steam-precios-ug/) | **Ukrainian Gang Extension.** Steam Ukraine prices in HK$, USDT and bolívares at the Binance P2P rate, with a receipt per edition, a region comparison and the UG list for the group. UI in English and Spanish. | In use, v0.2.0 |
-| [`tumblr-no-wall`](extensions/tumblr-no-wall/) | Removes Tumblr's "Sign up or log in" wall, restores scrolling and adds an HD viewer and a Pinterest button. UI follows the browser's language. | In use, v1.3.0 |
+## [Ukrainian Gang Extension](extensions/steam-precios-ug/)
 
-| | |
-|---|---|
-| ![Receipt under a Steam edition](extensions/steam-precios-ug/docs/ticket.png) | ![Stub next to each search price](extensions/steam-precios-ug/docs/search.png) |
-| A receipt under every edition, with the price in ₴, HK$, USDT and Bs | A stub next to every paid price in search and in lists |
-| ![UG list popup](extensions/steam-precios-ug/docs/popup.png) | ![Tumblr without the wall](extensions/tumblr-no-wall/docs/hero.png) |
-| The UG list with the total, the wallet and the summary for WhatsApp | Tumblr without the login wall, with the HD and Pin buttons |
+[![A receipt under the YoRHa Edition of NieR:Automata](extensions/steam-precios-ug/docs/hero.png)](extensions/steam-precios-ug/)
 
-The UG extension starts in English and has an **Español** option in its settings. Tumblr No Login Wall has no settings page: it uses the browser's language.
+Steam Ukraine prices in HK$, USDT and bolívares at the Binance P2P rate: a receipt under every edition of NieR:Automata, a region comparison, stubs in search and the UG list for the group. UI in English, with Spanish in the settings. Version 0.2.1.
+
+## [tumblr-no-wall](extensions/tumblr-no-wall/)
+
+[![A Charli XCX post on Tumblr without the sign-up wall](extensions/tumblr-no-wall/docs/hero.png)](extensions/tumblr-no-wall/)
+
+Removes Tumblr's "Sign up or log in" wall, gives scrolling back to the page and adds an HD viewer and a Pinterest button over images. The screenshot is a Charli XCX post. UI follows the browser's language. Version 1.3.0.
 
 ## Install an extension
 
@@ -54,7 +52,7 @@ GitHub Actions checks the manifests and runs the unit tests on every push to `ma
 
 1. Create `extensions/<name>/` with its `manifest.json` (Manifest V3, version `0.1.0`) and its `README.md`. The README says what it does, how to install it and what it relies on to detect things on the page.
 2. If it has logic worth testing, add a `package.json` with `npm test` and add it to the workflow's matrix.
-3. Add it to the table above.
+3. Add a section for it above, with its name as the heading and one screenshot at the top.
 
 ## Layout
 
